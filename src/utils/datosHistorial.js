@@ -1,0 +1,123 @@
+// src/utils/datosHistorial.js
+
+export const cleanCsvText = `Nombre,Usuario KIck/Discord,Acciones,Monto,Ganancia,Metodo Pago,Numero Tefl,Comentario del mensaje
+Alvaro Bizarro Díaz,-,1.00 HC,3,9,AGORA,,-
+Renzo Lozano,Dath18,4.00 HC,12,36,AGORA + PLIN,,2 pagos: 6+6
+Leon Condori Jeremy Joao,-,1.00 HC,3,9,BCP,,-
+ELIAS ANTONIO APAZA,,23.33 HC,70,210,PLIN,,
+Diego A. Chavez Ponce,-,20.00 HC,60,180,PLIN,,3 pagos: 10+20+30
+ALDO HUAMANI,,6.67 HC,20,60,PLIN,,
+Ernesto Andres Maguina Vilchez,,6.67 HC,20,60,PLIN,979327950,979327950
+PIERO VALLE,,6.67 HC,20,60,PLIN,,
+Carlos Calero,-,5.00 HC,15,45,PLIN,,2 pagos: 12+3
+PIEROL LUIS,,3.33 HC,10,30,PLIN,922983638,922983638
+Jhosep Kennedy Pajuelo,-,3.00 HC,9,27,PLIN,,Recibiste un PLIN QR
+Esequias Stalin Aguirre Valdivia,-,2.00 HC,6,18,PLIN,,-
+Gabriel Renato Cardenas,-,2.00 HC,6,18,PLIN,,Recibiste un PLIN QR
+Fabrizio Ernesto Crispin,-,1.00 HC,3,9,PLIN,,Recibiste un PLIN QR
+-,ViejoCerdo,5.00 HC,15,45,SUB,,Canjeo una sub por acciones
+Edwin Lov*,-,23.33 HC,70,210,YAPE,,20   +   85   +   17   +   3   -   55 (se devolcio 55 so)
+Gabriel Bej*,-,21.00 HC,63,189,YAPE,,4 pagos: 3+30+12+18
+Sebastian Ang*,lTiburonCiN,17.00 HC,51,153,YAPE,,2 pagos: 21+30
+Carlos Veg*,-,16.67 HC,50,150,YAPE,,2 pagos: 38+12
+Irving Pal*,-,16.67 HC,50,150,YAPE,,Toy tite
+Jorge Ant*,-,16.67 HC,50,150,YAPE,,-
+Miguel Cru*,joakinchero ,16.67 HC,50,150,YAPE,,flaya no se de que trata joakinchero 
+Ricki Son*,-,16.67 HC,50,150,YAPE,,-
+Dannyel Hua*,-,15.00 HC,45,135,YAPE,981476888,981476888 feliz inversionista
+Junior Cha*,rodrigo_tan,13.33 HC,40,120,YAPE,946680575,5 pagos: 2+3+7+20+8 946680575 ahí está mi número flaya 
+Waldir Lla*,-,11.00 HC,33,99,YAPE,,2 pagos: 30+3
+Alex Fer*,-,10.00 HC,30,90,YAPE,,Alex Fernández Acosta
+Alvaro Can*,-,10.00 HC,30,90,YAPE,,4 pagos: 12+3+9+6
+Angel Flo*,-,10.00 HC,30,90,YAPE,,Puedo comprar 1000 tickets?
+Carlos Coa*,cora_feed,10.00 HC,30,90,YAPE,,-
+Christian Esp*,,10.00 HC,30,90,YAPE,984007048,mi fono 984007048
+Maykol Est*,-,10.00 HC,30,90,YAPE,,2 pagos: 24+6
+Rodrigo Cha*,-,10.00 HC,30,90,YAPE,,Mi rey
+William Inq*,-,10.00 HC,30,90,YAPE,,Huesos anotame y comprame las acciones
+David Sam*,-,9.00 HC,27,81,YAPE,,2 pagos: 21+6
+Juan Tor*,drkzzzmfc,9.00 HC,27,81,YAPE,,3 pagos: 3+15+9 / mi nick de kick v: drkzzzmfc
+Scott Qui*,-,8.00 HC,24,72,YAPE,,2 pagos: 12+12
+Jheremy Leo*,-,7.33 HC,22,66,YAPE,953463854,3 pagos: 6+6+10 --- 953463854
+Jhonatan Hua*,-,7.00 HC,21,63,YAPE,,7 acciones y me pagas x4 flaya
+Rodrigo Cua*,-,7.00 HC,21,63,YAPE,963362143,3 pagos: 6+12+3 --- 963362143
+Carlos Alv*,-,6.67 HC,20,60,YAPE,,todo a sanchiz papay todo al jutapi
+Christian Sal*,,6.67 HC,20,60,YAPE,989883005,989883005
+Daniel Tom*,,6.67 HC,20,60,YAPE,973704009,973704009
+Denis Pan*,,6.67 HC,20,60,YAPE,951651704,"El de 20$oles - 951651704, Confío en Huesos de Wall "
+Elwin Junior Apaza,,6.67 HC,20,60,YAPE,,
+Jesus Ort*,,6.67 HC,20,60,YAPE,944849710,944849710
+Jhon Ber*,,6.67 HC,20,60,YAPE,977541499,977541499
+Renzo Mam*,,6.67 HC,20,60,YAPE,,
+Rusbell Aba*,-,6.67 HC,20,60,YAPE,,vamos al x4
+Schneider Cal*,mc322sch ,6.67 HC,20,60,YAPE,932038618,932038618: mc322sch usuario kick
+David Cut*,Frustrante,6.00 HC,18,54,YAPE,,3 pagos: 9+6+3
+Edwin Lla*,rey_l10,6.00 HC,18,54,YAPE,,3 pagos: 3+12+3 / mi nick es rey_l10
+Franco Cas*,-,5.67 HC,17,51,YAPE,,3 pagos: 9+3+5
+Max Gut*,,5.67 HC,17,51,YAPE,936382845,toda mi cena - 936382845 yape.
+Giovanni Saa*,-,5.33 HC,16,48,YAPE,,-
+Alexandro Zun*,-,5.00 HC,15,45,YAPE,,2 pagos: 6+9
+Brayan Lau*,-,5.00 HC,15,45,YAPE,,confío en las acciones flap
+Jose Tor*,-,5.00 HC,15,45,YAPE,,-
+Jaser Vas*,,4.33 HC,13,39,YAPE,,
+Rhai Gon*,sourfang,4.33 HC,13,39,YAPE,,2 pagos 10 + 3 yo sourfang un inversionista más
+David Con*,-,4.00 HC,12,36,YAPE,,2 pagos: 6+6
+Fiorella Alv*,-,4.00 HC,12,36,YAPE,,4 acciones porfi uu
+Manuel Ara*,Nuevoyear,4.00 HC,12,36,YAPE,,2 pagos: 3+9 / Nick(Nuevoyear)
+Miguel Pri*,-,4.00 HC,12,36,YAPE,,Con fe y bola
+Nelson May*,-,4.00 HC,12,36,YAPE,,2 pagos: 9+3
+Carlos Far*,,3.67 HC,11,33,YAPE,,
+Anthony Enr*,AtomicWP,3.33 HC,10,30,YAPE,,AtomicWP pe hueso
+Brayan Hua*,-,3.33 HC,10,30,YAPE,,Chapa mi menu hueso
+Brian Fer*,,3.33 HC,10,30,YAPE,,Inversion en huesos SA
+Ciro Gal*,,3.33 HC,10,30,YAPE,,"AHORA SÍ HUESITOS, TODO A JP 🤑🤑🤑🤑🤑"
+Daniel Agu*,,3.33 HC,10,30,YAPE,,
+Diego Gar,,3.33 HC,10,30,YAPE,,
+Edgar Mam*,-,3.33 HC,10,30,YAPE,932330796,"flap, mi número es 932330796"
+Edward Ven,Ed_vr,3.33 HC,10,30,YAPE,,Ed_vr
+Giancarlo Qui*,,3.33 HC,10,30,YAPE,,Vamos JP
+Jhener Est*,,3.33 HC,10,30,YAPE,,
+Lenin Yuc*,Lenin y.,3.33 HC,10,30,YAPE,,Lenin y. le robe 50 centimos
+Luis Sal*,,3.33 HC,10,30,YAPE,,
+Manuel Fel*,,3.33 HC,10,30,YAPE,907488989,907488989
+Nelson Per*,Miracledearequipa,3.33 HC,10,30,YAPE,,nelson perez / miracledearequipa
+Nexon Lau*,BarnniEldrogoSaurio,3.33 HC,10,30,YAPE,,Flaya soy el BarnniEldrogoSaurio
+Rafael Cal*,,3.33 HC,10,30,YAPE,925900395,925900395
+Carlos Roj*,-,3.00 HC,9,27,YAPE,,Estafame
+Diego Tit*,-,3.00 HC,9,27,YAPE,939028388,939028388
+Gabriel Cur*,-,3.00 HC,9,27,YAPE,,3 acciones huesito
+Jorge Men*,-,3.00 HC,9,27,YAPE,,-
+Michael Say*,-,3.00 HC,9,27,YAPE,,"Viva las acciones, me agregas bebito"
+Ruben La*,-,3.00 HC,9,27,YAPE,,3 pagos: 3+3+3
+Jose Men*,-,2.67 HC,8,24,YAPE,,quiero entrar a la piramidal Go sanchez
+Adan Qui*,-,2.00 HC,6,18,YAPE,,2 pagos: 3+3
+Diego Ama*,-,2.00 HC,6,18,YAPE,,2 pagos: 3+3
+Gean Flo*,-,2.00 HC,6,18,YAPE,,-
+Luis Aqu*,finochan,2.00 HC,6,18,YAPE,,saludos yo finochan / tengo 2 tikes yo
+Luis Hua*,-,2.00 HC,6,18,YAPE,,2 pagos: 3+3
+Pablo Leq*,-,2.00 HC,6,18,YAPE,,2 pagos: 3+3
+Vladimir Vil*,-,2.00 HC,6,18,YAPE,,anótame huesos
+Ariel Fer*,-,1.67 HC,5,15,YAPE,,flap mi inversion
+Estalin Roj*,-,1.67 HC,5,15,YAPE,,Tee mandooo 5 so Flap
+Luis Loa*,-,1.67 HC,5,15,YAPE,,-
+Alberth May*,-,1.00 HC,3,9,YAPE,,-
+Alex Mor*,-,1.00 HC,3,9,YAPE,,Apura que sigue bajando la cuota
+Alexander Cho*,-,1.00 HC,3,9,YAPE,,"Huesos, keiko tiene 60k de votos pendientes"
+Anthony Men*,-,1.00 HC,3,9,YAPE,,Si no me pagas meto bomba ala voladora
+Dennis Son*,-,1.00 HC,3,9,YAPE,,-
+Diego Alv*,-,1.00 HC,3,9,YAPE,,1 flap
+Enrique Lla*,-,1.00 HC,3,9,YAPE,,hola flaya
+Fredy Cor*,-,1.00 HC,3,9,YAPE,,flayaaa explica . polymarket dice que ganará keiko?
+Guido Cca*,-,1.00 HC,3,9,YAPE,,-
+Jherson Tor*,-,1.00 HC,3,9,YAPE,,"ya compre mi rifa mrd , sanchez me dara mi terreno"
+Jhon Roj*,-,1.00 HC,3,9,YAPE,,Flapcito bonito saludame pe ga
+Joel Cru*,-,1.00 HC,3,9,YAPE,,con fe
+Jose Cor*,-,1.00 HC,3,9,YAPE,,Por un Perú protos
+Jose Mai*,-,1.00 HC,3,9,YAPE,,hola inversionistas de alto riesgo
+Juan Gon*,-,1.00 HC,3,9,YAPE,,-
+Rildo Ram*,-,1.00 HC,3,9,YAPE,,-
+Roberth Agu*,Axel,1.00 HC,3,9,YAPE,,yo Axel dale flap entro al proyecto
+Rodolfo Chu*,-,1.00 HC,3,9,YAPE,,Para mi hipoteca
+Yuri Cca*,-,1.00 HC,3,9,YAPE,,Mis ultmos 3 lucas hueso ojala gane JP
+Olenka Monteza Pumacahua Quispe Mamani Condorcanqui Chasqui de Carbajal,,3.33 HC,10,30,YAPE,,
+Juan Can*,-,14.00 HC,42,126,YAPE + PLIN,,2 Pagos Yape (15+12) / Plin (15)`;
