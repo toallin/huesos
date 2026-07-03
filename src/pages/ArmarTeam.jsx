@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { jugadorService } from '../services/jugadorService';
+import { jugadorService } from '../services/jugadorService.js';
 import './ArmarTeam.css';
 
 const ADMIN_PASSWORD = 'AdminMixtoneVandal2026_Secure#';

@@ -6,10 +6,14 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/jugadores': {
+      '/api': {
         target: 'http://localhost:5000',
         changeOrigin: true,
       }
     }
+  },
+  build: {
+    outDir: 'dist',
+    sourcemap: false,
   }
 });

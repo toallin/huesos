@@ -1,16 +1,15 @@
 // src/services/jugadorService.js
 import axios from 'axios';
 
-// Detectar si estamos en desarrollo o producción
-const isDevelopment = import.meta.env.DEV;
-const API_BASE_URL = isDevelopment
-    ? 'http://localhost:5000'
-    : window.location.origin; // En producción, la API está en el mismo dominio
+// En desarrollo: localhost:5000/api
+// En producción: /api (relativo al mismo dominio)
+const API_BASE_URL = import.meta.env.DEV
+    ? 'http://localhost:5000/api'
+    : '/api';
 
 console.log('🌐 API URL:', API_BASE_URL);
 
 export const jugadorService = {
-    // Obtener todos los jugadores
     getAll: async () => {
         try {
             const response = await axios.get(`${API_BASE_URL}/jugadores`);
@@ -21,7 +20,6 @@ export const jugadorService = {
         }
     },
 
-    // Crear un nuevo jugador
     create: async (jugador) => {
         try {
             const response = await axios.post(`${API_BASE_URL}/jugadores`, jugador, {
@@ -34,7 +32,6 @@ export const jugadorService = {
         }
     },
 
-    // Actualizar un jugador
     update: async (id, jugador) => {
         try {
             const response = await axios.put(`${API_BASE_URL}/jugadores/${id}`, jugador, {
@@ -47,7 +44,6 @@ export const jugadorService = {
         }
     },
 
-    // Eliminar un jugador
     delete: async (id) => {
         try {
             await axios.delete(`${API_BASE_URL}/jugadores/${id}`);
