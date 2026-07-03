@@ -5,39 +5,39 @@ const ADMIN_PASSWORD = 'AdminMixtoneVandal2026_Secure#';
 const MAX_POR_EQUIPO = 5; // 5 jugadores por equipo como CS2
 
 const defaultJugadores = [
-  { id: 1, nombre: 'Wallace', tier: 0, foto: 'https://images.unsplash.com/photo-1560169897-fc0cdbdfa4d5?q=80&w=300&auto=format&fit=crop' },
-  { id: 2, nombre: 'Mixwell', tier: 1, foto: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=300&auto=format&fit=crop' },
-  { id: 3, nombre: 'TenZ', tier: 0, foto: 'https://images.unsplash.com/photo-1553481187-be93c21490a9?q=80&w=300&auto=format&fit=crop' },
-  { id: 4, nombre: 'Aspas', tier: 2, foto: 'https://images.unsplash.com/photo-1612287230202-1bf1d85d1bdf?q=80&w=300&auto=format&fit=crop' },
-  { id: 5, nombre: 'Derke', tier: 2, foto: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=300&auto=format&fit=crop' },
-  { id: 6, nombre: 'Shao', tier: 3, foto: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=300&auto=format&fit=crop' },
-  { id: 7, nombre: 'Suygetsu', tier: 3, foto: 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=300&auto=format&fit=crop' },
-  { id: 8, nombre: 'Boaster', tier: 4, foto: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?q=80&w=300&auto=format&fit=crop' },
-  { id: 9, nombre: 'Chronicle', tier: 4, foto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=300&auto=format&fit=crop' },
-  { id: 10, nombre: 'Ange1', tier: 5, foto: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?q=80&w=300&auto=format&fit=crop' },
-  { id: 11, nombre: 'ScreaM', tier: 1, foto: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=300&auto=format&fit=crop' },
-  { id: 12, nombre: 'Nivera', tier: 2, foto: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=300&auto=format&fit=crop' },
-  { id: 13, nombre: 'Jamppi', tier: 1, foto: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=300&auto=format&fit=crop' },
-  { id: 14, nombre: 'Soulcas', tier: 3, foto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=300&auto=format&fit=crop' },
-  { id: 15, nombre: 'L1NK', tier: 3, foto: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?q=80&w=300&auto=format&fit=crop' },
-  { id: 16, nombre: 'f0al', tier: 4, foto: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=300&auto=format&fit=crop' },
-  { id: 17, nombre: 'keloqz', tier: 4, foto: 'https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?q=80&w=300&auto=format&fit=crop' },
-  { id: 18, nombre: 'AvovA', tier: 5, foto: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=300&auto=format&fit=crop' },
-  { id: 19, nombre: 'nukkye', tier: 5, foto: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=300&auto=format&fit=crop' },
-  { id: 20, nombre: 'hoody', tier: 5, foto: 'https://images.unsplash.com/photo-1489980508314-941910ded1f4?q=80&w=300&auto=format&fit=crop' },
+    { id: 1, nombre: 'Wallace', tier: 0, foto: 'https://images.unsplash.com/photo-1560169897-fc0cdbdfa4d5?q=80&w=300&auto=format&fit=crop' },
+    { id: 2, nombre: 'Mixwell', tier: 1, foto: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=300&auto=format&fit=crop' },
+    { id: 3, nombre: 'TenZ', tier: 0, foto: 'https://images.unsplash.com/photo-1553481187-be93c21490a9?q=80&w=300&auto=format&fit=crop' },
+    { id: 4, nombre: 'Aspas', tier: 2, foto: 'https://images.unsplash.com/photo-1612287230202-1bf1d85d1bdf?q=80&w=300&auto=format&fit=crop' },
+    { id: 5, nombre: 'Derke', tier: 2, foto: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=300&auto=format&fit=crop' },
+    { id: 6, nombre: 'Shao', tier: 3, foto: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=300&auto=format&fit=crop' },
+    { id: 7, nombre: 'Suygetsu', tier: 3, foto: 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=300&auto=format&fit=crop' },
+    { id: 8, nombre: 'Boaster', tier: 4, foto: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?q=80&w=300&auto=format&fit=crop' },
+    { id: 9, nombre: 'Chronicle', tier: 4, foto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=300&auto=format&fit=crop' },
+    { id: 10, nombre: 'Ange1', tier: 5, foto: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?q=80&w=300&auto=format&fit=crop' },
+    { id: 11, nombre: 'ScreaM', tier: 1, foto: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=300&auto=format&fit=crop' },
+    { id: 12, nombre: 'Nivera', tier: 2, foto: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=300&auto=format&fit=crop' },
+    { id: 13, nombre: 'Jamppi', tier: 1, foto: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=300&auto=format&fit=crop' },
+    { id: 14, nombre: 'Soulcas', tier: 3, foto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=300&auto=format&fit=crop' },
+    { id: 15, nombre: 'L1NK', tier: 3, foto: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?q=80&w=300&auto=format&fit=crop' },
+    { id: 16, nombre: 'f0al', tier: 4, foto: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=300&auto=format&fit=crop' },
+    { id: 17, nombre: 'keloqz', tier: 4, foto: 'https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?q=80&w=300&auto=format&fit=crop' },
+    { id: 18, nombre: 'AvovA', tier: 5, foto: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=300&auto=format&fit=crop' },
+    { id: 19, nombre: 'nukkye', tier: 5, foto: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=300&auto=format&fit=crop' },
+    { id: 20, nombre: 'hoody', tier: 5, foto: 'https://images.unsplash.com/photo-1489980508314-941910ded1f4?q=80&w=300&auto=format&fit=crop' },
 ];
 
 const TEAM_COLORS = [
-  '#ff4655', // Rojo Carmesí
-  '#f1c40f', // Amarillo Oro
-  '#00e5ff', // Cian Neón
-  '#aa3bff', // Púrpura Neón
-  '#2ecc71', // Verde Esmeralda
-  '#e67e22', // Naranja Fuego
-  '#3498db', // Azul Cobalto
-  '#e74c3c', // Rojo Tomate
-  '#9b59b6', // Violeta Oscuro
-  '#1abc9c'  // Verde Turquesa
+    '#ff4655', // Rojo Carmesí
+    '#f1c40f', // Amarillo Oro
+    '#00e5ff', // Cian Neón
+    '#aa3bff', // Púrpura Neón
+    '#2ecc71', // Verde Esmeralda
+    '#e67e22', // Naranja Fuego
+    '#3498db', // Azul Cobalto
+    '#e74c3c', // Rojo Tomate
+    '#9b59b6', // Violeta Oscuro
+    '#1abc9c'  // Verde Turquesa
 ];
 
 const ArmarTeam = () => {
@@ -93,7 +93,7 @@ const ArmarTeam = () => {
     // ── Draft helpers ───────────────────────────────────────────
     const estaSeleccionado = (id) => {
         return capitanes.some(c => c && c.id === id) ||
-               equipos.some(eq => eq.some(j => j.id === id));
+            equipos.some(eq => eq.some(j => j.id === id));
     };
 
     // Verificar si un equipo ya está lleno (capitán + 4 miembros = 5 total)
@@ -457,7 +457,7 @@ const ArmarTeam = () => {
                                                         <span className="cap-label">CAPITÁN {idx + 1}</span>
                                                         <span className="cap-name">{capitan.nombre}</span>
                                                     </div>
-                                                    <span className="cap-tier-badge" style={{ backgroundColor: `var(--tier-${capitan.tier})`, color: [0,1,3].includes(capitan.tier) ? '#fff' : '#000' }}>
+                                                    <span className="cap-tier-badge" style={{ backgroundColor: `var(--tier-${capitan.tier})`, color: [0, 1, 3].includes(capitan.tier) ? '#fff' : '#000' }}>
                                                         {capitan.tier === 0 ? 'S' : capitan.tier}
                                                     </span>
                                                 </div>

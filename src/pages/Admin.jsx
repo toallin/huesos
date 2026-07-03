@@ -2,11 +2,11 @@ import { useState, useEffect } from 'react';
 import './Admin.css';
 
 const defaultJugadores = [
-  { id: 1, nombre: 'Wallace', tier: 0, foto: 'https://images.unsplash.com/photo-1560169897-fc0cdbdfa4d5?q=80&w=300&auto=format&fit=crop' },
-  { id: 2, nombre: 'Mixwell', tier: 1, foto: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=300&auto=format&fit=crop' },
-  { id: 3, nombre: 'TenZ', tier: 0, foto: 'https://images.unsplash.com/photo-1553481187-be93c21490a9?q=80&w=300&auto=format&fit=crop' },
-  { id: 4, nombre: 'Aspas', tier: 2, foto: 'https://images.unsplash.com/photo-1612287230202-1bf1d85d1bdf?q=80&w=300&auto=format&fit=crop' },
-  { id: 5, nombre: 'Derke', tier: 2, foto: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=300&auto=format&fit=crop' },
+    { id: 1, nombre: 'Wallace', tier: 0, foto: 'https://images.unsplash.com/photo-1560169897-fc0cdbdfa4d5?q=80&w=300&auto=format&fit=crop' },
+    { id: 2, nombre: 'Mixwell', tier: 1, foto: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=300&auto=format&fit=crop' },
+    { id: 3, nombre: 'TenZ', tier: 0, foto: 'https://images.unsplash.com/photo-1553481187-be93c21490a9?q=80&w=300&auto=format&fit=crop' },
+    { id: 4, nombre: 'Aspas', tier: 2, foto: 'https://images.unsplash.com/photo-1612287230202-1bf1d85d1bdf?q=80&w=300&auto=format&fit=crop' },
+    { id: 5, nombre: 'Derke', tier: 2, foto: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=300&auto=format&fit=crop' },
 ];
 
 const Admin = () => {
@@ -40,7 +40,7 @@ const Admin = () => {
 
     const handleGuardar = (e) => {
         e.preventDefault();
-        
+
         if (!nombre.trim() || !foto.trim()) {
             alert('Por favor completa todos los campos.');
             return;
@@ -62,7 +62,7 @@ const Admin = () => {
 
         localStorage.setItem('listaJugadores', JSON.stringify(nuevaLista));
         setJugadores(nuevaLista);
-        
+
         // Resetear formulario
         setNombre('');
         setTier(1);
@@ -90,7 +90,7 @@ const Admin = () => {
             const nuevaLista = lista.filter(j => j.id !== id);
             localStorage.setItem('listaJugadores', JSON.stringify(nuevaLista));
             setJugadores(nuevaLista);
-            
+
             // Si estábamos editando al eliminado, cancelamos la edición
             if (editingId === id) {
                 handleCancelEdit();
@@ -138,12 +138,12 @@ const Admin = () => {
                     <form onSubmit={handleGuardar} className="admin-form">
                         <div className="form-group">
                             <label>NOMBRE DEL JUGADOR</label>
-                            <input 
+                            <input
                                 type="text"
-                                placeholder="Ej. Wallace" 
-                                value={nombre} 
-                                onChange={(e) => setNombre(e.target.value)} 
-                                required 
+                                placeholder="Ej. Wallace"
+                                value={nombre}
+                                onChange={(e) => setNombre(e.target.value)}
+                                required
                             />
                         </div>
 
@@ -159,12 +159,12 @@ const Admin = () => {
 
                         <div className="form-group">
                             <label>URL DE LA FOTO (AVATAR)</label>
-                            <input 
+                            <input
                                 type="url"
-                                placeholder="https://ejemplo.com/foto.jpg" 
-                                value={foto} 
-                                onChange={(e) => setFoto(e.target.value)} 
-                                required 
+                                placeholder="https://ejemplo.com/foto.jpg"
+                                value={foto}
+                                onChange={(e) => setFoto(e.target.value)}
+                                required
                             />
                         </div>
 
@@ -199,9 +199,9 @@ const Admin = () => {
                                     jugadores.map((jugador) => (
                                         <tr key={jugador.id}>
                                             <td>
-                                                <img 
-                                                    src={jugador.foto} 
-                                                    alt={jugador.nombre} 
+                                                <img
+                                                    src={jugador.foto}
+                                                    alt={jugador.nombre}
                                                     className="admin-table-avatar"
                                                     onError={(e) => {
                                                         e.target.src = 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=300&auto=format&fit=crop';
@@ -210,8 +210,8 @@ const Admin = () => {
                                             </td>
                                             <td className="player-name-cell">{jugador.nombre}</td>
                                             <td>
-                                                <span 
-                                                    className="admin-table-tier-badge" 
+                                                <span
+                                                    className="admin-table-tier-badge"
                                                     style={{ backgroundColor: `var(--tier-${jugador.tier})` }}
                                                 >
                                                     {jugador.tier === 0 ? 'TIER S' : `TIER ${jugador.tier}`}
@@ -219,14 +219,14 @@ const Admin = () => {
                                             </td>
                                             <td>
                                                 <div className="table-actions">
-                                                    <button 
+                                                    <button
                                                         className="action-btn edit-btn"
                                                         onClick={() => handleEditClick(jugador)}
                                                         title="Editar agente"
                                                     >
                                                         ✏️
                                                     </button>
-                                                    <button 
+                                                    <button
                                                         className="action-btn delete-btn"
                                                         onClick={() => handleEliminar(jugador.id)}
                                                         title="Eliminar agente"

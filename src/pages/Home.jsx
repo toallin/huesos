@@ -2,16 +2,16 @@ import { useState, useEffect } from 'react';
 import './Home.css';
 
 const defaultJugadores = [
-  { id: 1, nombre: 'Wallace', tier: 0, foto: 'https://images.unsplash.com/photo-1560169897-fc0cdbdfa4d5?q=80&w=300&auto=format&fit=crop' },
-  { id: 2, nombre: 'Mixwell', tier: 1, foto: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=300&auto=format&fit=crop' },
-  { id: 3, nombre: 'TenZ', tier: 0, foto: 'https://images.unsplash.com/photo-1553481187-be93c21490a9?q=80&w=300&auto=format&fit=crop' },
-  { id: 4, nombre: 'Aspas', tier: 2, foto: 'https://images.unsplash.com/photo-1612287230202-1bf1d85d1bdf?q=80&w=300&auto=format&fit=crop' },
-  { id: 5, nombre: 'Derke', tier: 2, foto: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=300&auto=format&fit=crop' },
-  { id: 6, nombre: 'Shao', tier: 3, foto: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=300&auto=format&fit=crop' },
-  { id: 7, nombre: 'Suygetsu', tier: 3, foto: 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=300&auto=format&fit=crop' },
-  { id: 8, nombre: 'Boaster', tier: 4, foto: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?q=80&w=300&auto=format&fit=crop' },
-  { id: 9, nombre: 'Chronicle', tier: 4, foto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=300&auto=format&fit=crop' },
-  { id: 10, nombre: 'Ange1', tier: 5, foto: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?q=80&w=300&auto=format&fit=crop' },
+    { id: 1, nombre: 'Wallace', tier: 0, foto: 'https://images.unsplash.com/photo-1560169897-fc0cdbdfa4d5?q=80&w=300&auto=format&fit=crop' },
+    { id: 2, nombre: 'Mixwell', tier: 1, foto: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=300&auto=format&fit=crop' },
+    { id: 3, nombre: 'TenZ', tier: 0, foto: 'https://images.unsplash.com/photo-1553481187-be93c21490a9?q=80&w=300&auto=format&fit=crop' },
+    { id: 4, nombre: 'Aspas', tier: 2, foto: 'https://images.unsplash.com/photo-1612287230202-1bf1d85d1bdf?q=80&w=300&auto=format&fit=crop' },
+    { id: 5, nombre: 'Derke', tier: 2, foto: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=300&auto=format&fit=crop' },
+    { id: 6, nombre: 'Shao', tier: 3, foto: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=300&auto=format&fit=crop' },
+    { id: 7, nombre: 'Suygetsu', tier: 3, foto: 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=300&auto=format&fit=crop' },
+    { id: 8, nombre: 'Boaster', tier: 4, foto: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?q=80&w=300&auto=format&fit=crop' },
+    { id: 9, nombre: 'Chronicle', tier: 4, foto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=300&auto=format&fit=crop' },
+    { id: 10, nombre: 'Ange1', tier: 5, foto: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?q=80&w=300&auto=format&fit=crop' },
 ];
 
 const Home = () => {
@@ -41,7 +41,7 @@ const Home = () => {
             <header className="home-header">
                 <h1>AGENTES REGISTRADOS</h1>
                 <p className="home-subtitle">Lista de jugadores para el draft de salas mixtas</p>
-                
+
                 <div className="stats-bar">
                     <div className="stat-card">
                         <span className="stat-value">{jugadores.length}</span>
@@ -61,32 +61,32 @@ const Home = () => {
             <div className="filters-container">
                 <div className="search-box">
                     <span className="search-icon">🔍</span>
-                    <input 
-                        type="text" 
-                        placeholder="BUSCAR JUGADOR..." 
-                        value={busqueda} 
-                        onChange={(e) => setBusqueda(e.target.value)} 
+                    <input
+                        type="text"
+                        placeholder="BUSCAR JUGADOR..."
+                        value={busqueda}
+                        onChange={(e) => setBusqueda(e.target.value)}
                     />
                 </div>
-                
+
                 <div className="tier-filter-buttons">
-                    <button 
-                        className={tierFiltro === 'todos' ? 'val-btn active' : 'val-btn secondary'} 
+                    <button
+                        className={tierFiltro === 'todos' ? 'val-btn active' : 'val-btn secondary'}
                         onClick={() => setTierFiltro('todos')}
                     >
                         TODOS
                     </button>
-                    <button 
-                        className={tierFiltro === '0' ? 'val-btn active' : 'val-btn secondary'} 
+                    <button
+                        className={tierFiltro === '0' ? 'val-btn active' : 'val-btn secondary'}
                         style={tierFiltro === '0' ? { backgroundColor: `var(--tier-0)`, borderColor: `var(--tier-0)` } : {}}
                         onClick={() => setTierFiltro('0')}
                     >
                         TIER S
                     </button>
                     {[1, 2, 3, 4, 5].map(t => (
-                        <button 
+                        <button
                             key={t}
-                            className={tierFiltro === String(t) ? 'val-btn active' : 'val-btn secondary'} 
+                            className={tierFiltro === String(t) ? 'val-btn active' : 'val-btn secondary'}
                             style={tierFiltro === String(t) ? { backgroundColor: `var(--tier-${t})`, borderColor: `var(--tier-${t})` } : {}}
                             onClick={() => setTierFiltro(String(t))}
                         >
