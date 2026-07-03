@@ -1,32 +1,24 @@
 import { useState, useEffect } from 'react';
 import './Home.css';
 
-const defaultJugadores = [
-    { id: 1, nombre: 'Wallace', tier: 0, foto: 'https://images.unsplash.com/photo-1560169897-fc0cdbdfa4d5?q=80&w=300&auto=format&fit=crop' },
-    { id: 2, nombre: 'Mixwell', tier: 1, foto: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=300&auto=format&fit=crop' },
-    { id: 3, nombre: 'TenZ', tier: 0, foto: 'https://images.unsplash.com/photo-1553481187-be93c21490a9?q=80&w=300&auto=format&fit=crop' },
-    { id: 4, nombre: 'Aspas', tier: 2, foto: 'https://images.unsplash.com/photo-1612287230202-1bf1d85d1bdf?q=80&w=300&auto=format&fit=crop' },
-    { id: 5, nombre: 'Derke', tier: 2, foto: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=300&auto=format&fit=crop' },
-    { id: 6, nombre: 'Shao', tier: 3, foto: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=300&auto=format&fit=crop' },
-    { id: 7, nombre: 'Suygetsu', tier: 3, foto: 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=300&auto=format&fit=crop' },
-    { id: 8, nombre: 'Boaster', tier: 4, foto: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?q=80&w=300&auto=format&fit=crop' },
-    { id: 9, nombre: 'Chronicle', tier: 4, foto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=300&auto=format&fit=crop' },
-    { id: 10, nombre: 'Ange1', tier: 5, foto: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?q=80&w=300&auto=format&fit=crop' },
-];
-
 const Home = () => {
     const [jugadores, setJugadores] = useState([]);
     const [busqueda, setBusqueda] = useState('');
     const [tierFiltro, setTierFiltro] = useState('todos');
 
     useEffect(() => {
+        console.log('🔄 Home - useEffect ejecutado');
         const data = localStorage.getItem('listaJugadores');
+        console.log('📦 Datos en localStorage (Home):', data);
+
         if (data) {
-            setJugadores(JSON.parse(data));
+            const parsedData = JSON.parse(data);
+            console.log('✅ Datos parseados (Home):', parsedData);
+            setJugadores(parsedData);
         } else {
-            // Guardamos valores por defecto si está vacío para que se vea genial al iniciar
-            localStorage.setItem('listaJugadores', JSON.stringify(defaultJugadores));
-            setJugadores(defaultJugadores);
+            console.log('⚠️ No hay datos en localStorage (Home), inicializando vacío');
+            localStorage.setItem('listaJugadores', JSON.stringify([]));
+            setJugadores([]);
         }
     }, []);
 
@@ -121,7 +113,7 @@ const Home = () => {
                     ))
                 ) : (
                     <div className="empty-message-container">
-                        <p className="empty-message">No se encontraron agentes con los filtros actuales.</p>
+                        <p className="empty-message">No hay agentes registrados en el sistema.</p>
                     </div>
                 )}
             </div>
