@@ -1,3 +1,10 @@
 {
-    "jugadores": []
+  "jugadores": [
+    {
+      "id": 1783063540949,
+      "nombre": "NaG4_666",
+      "tier": 5,
+      "foto": "https://i.pinimg.com/736x/69/6c/d5/696cd5d4d8beb91b1f0d27bc5f8fc1d2.jpg"
+    }
+  ]
 }

@@ -8,11 +8,12 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start": "node server.js",
-    "server": "json-server --watch db.json --port 5000 --host 0.0.0.0"
+    "start": "node server-express.cjs",
+    "server": "node server-express.cjs"
   },
   "dependencies": {
     "axios": "^1.18.1",
+    "express": "^5.2.1",
     "json-server": "^1.0.0-beta.15",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
