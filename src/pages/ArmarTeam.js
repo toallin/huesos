@@ -1,31 +1,9 @@
 import { useState, useEffect } from 'react';
+import { jugadorService } from '../services/jugadorService';
 import './ArmarTeam.css';
 
 const ADMIN_PASSWORD = 'AdminMixtoneVandal2026_Secure#';
-const MAX_POR_EQUIPO = 5; // 5 jugadores por equipo como CS2
-
-const defaultJugadores = [
-    { id: 1, nombre: 'Wallace', tier: 0, foto: 'https://images.unsplash.com/photo-1560169897-fc0cdbdfa4d5?q=80&w=300&auto=format&fit=crop' },
-    { id: 2, nombre: 'Mixwell', tier: 1, foto: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=300&auto=format&fit=crop' },
-    { id: 3, nombre: 'TenZ', tier: 0, foto: 'https://images.unsplash.com/photo-1553481187-be93c21490a9?q=80&w=300&auto=format&fit=crop' },
-    { id: 4, nombre: 'Aspas', tier: 2, foto: 'https://images.unsplash.com/photo-1612287230202-1bf1d85d1bdf?q=80&w=300&auto=format&fit=crop' },
-    { id: 5, nombre: 'Derke', tier: 2, foto: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=300&auto=format&fit=crop' },
-    { id: 6, nombre: 'Shao', tier: 3, foto: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=300&auto=format&fit=crop' },
-    { id: 7, nombre: 'Suygetsu', tier: 3, foto: 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=300&auto=format&fit=crop' },
-    { id: 8, nombre: 'Boaster', tier: 4, foto: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?q=80&w=300&auto=format&fit=crop' },
-    { id: 9, nombre: 'Chronicle', tier: 4, foto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=300&auto=format&fit=crop' },
-    { id: 10, nombre: 'Ange1', tier: 5, foto: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?q=80&w=300&auto=format&fit=crop' },
-    { id: 11, nombre: 'ScreaM', tier: 1, foto: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=300&auto=format&fit=crop' },
-    { id: 12, nombre: 'Nivera', tier: 2, foto: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=300&auto=format&fit=crop' },
-    { id: 13, nombre: 'Jamppi', tier: 1, foto: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=300&auto=format&fit=crop' },
-    { id: 14, nombre: 'Soulcas', tier: 3, foto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=300&auto=format&fit=crop' },
-    { id: 15, nombre: 'L1NK', tier: 3, foto: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?q=80&w=300&auto=format&fit=crop' },
-    { id: 16, nombre: 'f0al', tier: 4, foto: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=300&auto=format&fit=crop' },
-    { id: 17, nombre: 'keloqz', tier: 4, foto: 'https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?q=80&w=300&auto=format&fit=crop' },
-    { id: 18, nombre: 'AvovA', tier: 5, foto: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=300&auto=format&fit=crop' },
-    { id: 19, nombre: 'nukkye', tier: 5, foto: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=300&auto=format&fit=crop' },
-    { id: 20, nombre: 'hoody', tier: 5, foto: 'https://images.unsplash.com/photo-1489980508314-941910ded1f4?q=80&w=300&auto=format&fit=crop' },
-];
+const MAX_POR_EQUIPO = 5;
 
 const TEAM_COLORS = [
     '#ff4655', // Rojo Carmesí
@@ -42,33 +20,48 @@ const TEAM_COLORS = [
 
 const ArmarTeam = () => {
     const [jugadores, setJugadores] = useState([]);
+    const [loading, setLoading] = useState(false);
 
-    // ── Admin auth ──────────────────────────────────────────────
+    // ── Admin auth ──
     const [adminLogueado, setAdminLogueado] = useState(false);
     const [passInput, setPassInput] = useState('');
     const [mostrarLoginAdmin, setMostrarLoginAdmin] = useState(false);
 
-    // ── Draft state ─────────────────────────────────────────────
+    // ── Draft state ──
     const [numEquipos, setNumEquipos] = useState(2);
     const [fase, setFase] = useState('configuracion');
     const [capitanes, setCapitanes] = useState([]);
     const [equipos, setEquipos] = useState([]);
     const [turnoDeIndex, setTurnoDeIndex] = useState(0);
 
-    // ── Matchup state ────────────────────────────────────────────
-    const [matchups, setMatchups] = useState(null); // null = no mostrar
+    // ── Matchup state ──
+    const [matchups, setMatchups] = useState(null);
 
-    // Cargar jugadores
+    // Cargar jugadores desde el backend
     useEffect(() => {
-        const data = localStorage.getItem('listaJugadores');
-        if (data) setJugadores(JSON.parse(data));
-        else {
-            localStorage.setItem('listaJugadores', JSON.stringify(defaultJugadores));
-            setJugadores(defaultJugadores);
-        }
+        cargarJugadores();
     }, []);
 
-    // ── Auth helpers ────────────────────────────────────────────
+    const cargarJugadores = async () => {
+        setLoading(true);
+        try {
+            const data = await jugadorService.getAll();
+            console.log('✅ Jugadores cargados (ArmarTeam):', data);
+            setJugadores(data);
+        } catch (error) {
+            console.error('❌ Error cargando jugadores (ArmarTeam):', error);
+            // Fallback a localStorage
+            const localData = localStorage.getItem('listaJugadores');
+            if (localData) {
+                console.log('📦 Usando datos de localStorage como fallback');
+                setJugadores(JSON.parse(localData));
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // ── Auth helpers ──
     const handleLoginAdmin = (e) => {
         e.preventDefault();
         if (passInput === ADMIN_PASSWORD) {
@@ -83,27 +76,25 @@ const ArmarTeam = () => {
 
     const handleLogoutAdmin = () => {
         setAdminLogueado(false);
-        // Reset draft al cerrar sesión
         setCapitanes([]);
         setEquipos([]);
         setTurnoDeIndex(0);
         setFase('configuracion');
+        setMatchups(null);
     };
 
-    // ── Draft helpers ───────────────────────────────────────────
+    // ── Draft helpers ──
     const estaSeleccionado = (id) => {
         return capitanes.some(c => c && c.id === id) ||
             equipos.some(eq => eq.some(j => j.id === id));
     };
 
-    // Verificar si un equipo ya está lleno (capitán + 4 miembros = 5 total)
     const equipoLleno = (idx) => {
         const cap = capitanes[idx];
         const miembros = equipos[idx] || [];
-        return cap && miembros.length >= MAX_POR_EQUIPO - 1; // -1 porque el capitán cuenta
+        return cap && miembros.length >= MAX_POR_EQUIPO - 1;
     };
 
-    // Verificar si TODOS los equipos están llenos
     const todosLlenos = () => {
         return Array.from({ length: capitanes.length }).every((_, idx) => equipoLleno(idx));
     };
@@ -123,7 +114,6 @@ const ArmarTeam = () => {
                 }
             }
         } else if (fase === 'draft') {
-            // Buscar el siguiente equipo que no esté lleno desde turnoDeIndex
             let intentos = 0;
             let idx = turnoDeIndex;
             while (intentos < capitanes.length) {
@@ -132,7 +122,6 @@ const ArmarTeam = () => {
                         i === idx ? [...eq, jugador] : eq
                     );
                     setEquipos(nuevosEquipos);
-                    // Siguiente turno: avanzar y saltar equipos llenos
                     let siguienteIdx = (idx + 1) % capitanes.length;
                     setTurnoDeIndex(siguienteIdx);
                     break;
@@ -167,9 +156,7 @@ const ArmarTeam = () => {
         setMatchups(null);
     };
 
-    // Genera enfrentamientos random entre equipos
     const handleEnfrentamientoRandom = () => {
-        // Construir lista de equipos completos: capitán + miembros
         const todosEquipos = capitanes.map((cap, idx) => ({
             nombre: `EQUIPO ${idx + 1}`,
             color: TEAM_COLORS[idx % TEAM_COLORS.length],
@@ -177,15 +164,11 @@ const ArmarTeam = () => {
             miembros: equipos[idx] || [],
         }));
 
-        // Mezclar aleatoriamente
         const mezclados = [...todosEquipos].sort(() => Math.random() - 0.5);
-
-        // Armar pares de enfrentamientos
         const pares = [];
         for (let i = 0; i + 1 < mezclados.length; i += 2) {
             pares.push([mezclados[i], mezclados[i + 1]]);
         }
-        // Si número impar, el último descansa
         if (mezclados.length % 2 !== 0) {
             pares.push([mezclados[mezclados.length - 1], null]);
         }
@@ -204,9 +187,8 @@ const ArmarTeam = () => {
         mezclados.forEach(jugador => {
             let intentos = 0;
             while (intentos < capitanes.length) {
-                const cap = capitanes[currentTurnIdx];
                 const miembros = nuevosEquipos[currentTurnIdx];
-                if (cap && miembros.length < MAX_POR_EQUIPO - 1) {
+                if (capitanes[currentTurnIdx] && miembros.length < MAX_POR_EQUIPO - 1) {
                     nuevosEquipos[currentTurnIdx].push(jugador);
                     currentTurnIdx = (currentTurnIdx + 1) % capitanes.length;
                     break;
@@ -220,7 +202,7 @@ const ArmarTeam = () => {
         setTurnoDeIndex(currentTurnIdx);
     };
 
-    // ── Instruction bar ─────────────────────────────────────────
+    // ── Instruction bar ──
     const getInstruccion = () => {
         if (!adminLogueado) {
             return (
@@ -259,6 +241,16 @@ const ArmarTeam = () => {
         );
     };
 
+    if (loading) {
+        return (
+            <div className="draft-page-container">
+                <div className="loading-container">
+                    <p>⏳ Cargando jugadores...</p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="draft-page-container">
             {/* ── Header ── */}
@@ -266,6 +258,23 @@ const ArmarTeam = () => {
                 <h1>SALA DE DRAFT</h1>
                 <p className="draft-subtitle">Arma tus escuadras de 5 — estilo CS2</p>
                 {getInstruccion()}
+
+                {/* Botón recargar */}
+                <button
+                    onClick={cargarJugadores}
+                    className="val-btn secondary"
+                    style={{
+                        position: 'absolute',
+                        right: '180px',
+                        top: '20px',
+                        width: 'auto',
+                        padding: '6px 14px',
+                        fontSize: '11px'
+                    }}
+                    disabled={loading}
+                >
+                    🔄 RECARGAR
+                </button>
 
                 {/* Admin auth button top-right */}
                 <div className="admin-auth-bar">
@@ -336,7 +345,6 @@ const ArmarTeam = () => {
                             if (eqIdx !== -1) label = `EQ ${eqIdx + 1}`;
                         }
 
-                        // Cursor bloqueado si no es admin o ya está seleccionado
                         const bloqueado = !adminLogueado || seleccionado;
 
                         return (
@@ -375,7 +383,6 @@ const ArmarTeam = () => {
             {/* ── Sección de Draft (solo admin) ── */}
             {adminLogueado && (
                 <div className="draft-active-layout">
-                    {/* Configuración inicial */}
                     {fase === 'configuracion' && (
                         <div className="lobby-setup-wrapper">
                             <div className="lobby-setup-card">
@@ -419,7 +426,6 @@ const ArmarTeam = () => {
                         </div>
                     )}
 
-                    {/* Equipos activos */}
                     {fase !== 'configuracion' && (
                         <div className="teams-grid-container"
                             style={{ gridTemplateColumns: `repeat(${capitanes.length}, minmax(220px, 1fr))` }}>
@@ -438,7 +444,6 @@ const ArmarTeam = () => {
                                     >
                                         <div className="team-header-panel">
                                             <h2>EQUIPO {idx + 1}</h2>
-                                            {/* Slots counter */}
                                             <div className="team-slots-bar">
                                                 {Array.from({ length: MAX_POR_EQUIPO }).map((_, s) => (
                                                     <div
@@ -480,7 +485,6 @@ const ArmarTeam = () => {
                                                     </div>
                                                 </div>
                                             ))}
-                                            {/* Slots vacíos */}
                                             {Array.from({ length: Math.max(0, (MAX_POR_EQUIPO - 1) - miembros.length) }).map((_, s) => (
                                                 <div key={`empty-${s}`} className="team-member-row empty-slot">
                                                     <span className="member-index">#{miembros.length + s + 1}</span>
@@ -499,7 +503,7 @@ const ArmarTeam = () => {
                 </div>
             )}
 
-            {/* ── Botón Enfrentamiento (solo cuando el draft está completo) ── */}
+            {/* ── Botón Enfrentamiento ── */}
             {adminLogueado && fase === 'draft' && capitanes.length > 0 && capitanes.every(c => c !== null) && (() => {
                 const allFull = capitanes.every((_, idx) => {
                     const miembros = equipos[idx] || [];
@@ -529,7 +533,6 @@ const ArmarTeam = () => {
                         <div className="matchup-brackets">
                             {matchups.map((par, pIdx) => (
                                 <div key={pIdx} className="matchup-pair">
-                                    {/* Equipo A */}
                                     <div className="matchup-team" style={{ '--mc': par[0].color }}>
                                         <div className="matchup-team-name" style={{ color: par[0].color }}>{par[0].nombre}</div>
                                         <div className="matchup-captain">
@@ -547,10 +550,8 @@ const ArmarTeam = () => {
                                         </ul>
                                     </div>
 
-                                    {/* VS Divider */}
                                     <div className="matchup-vs">VS</div>
 
-                                    {/* Equipo B */}
                                     {par[1] ? (
                                         <div className="matchup-team" style={{ '--mc': par[1].color }}>
                                             <div className="matchup-team-name" style={{ color: par[1].color }}>{par[1].nombre}</div>

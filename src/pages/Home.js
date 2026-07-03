@@ -1,26 +1,36 @@
 import { useState, useEffect } from 'react';
+import { jugadorService } from './services/jugadorService';
 import './Home.css';
 
 const Home = () => {
     const [jugadores, setJugadores] = useState([]);
     const [busqueda, setBusqueda] = useState('');
     const [tierFiltro, setTierFiltro] = useState('todos');
+    const [loading, setLoading] = useState(false);
 
+    // Cargar jugadores desde el backend
     useEffect(() => {
-        console.log('🔄 Home - useEffect ejecutado');
-        const data = localStorage.getItem('listaJugadores');
-        console.log('📦 Datos en localStorage (Home):', data);
-
-        if (data) {
-            const parsedData = JSON.parse(data);
-            console.log('✅ Datos parseados (Home):', parsedData);
-            setJugadores(parsedData);
-        } else {
-            console.log('⚠️ No hay datos en localStorage (Home), inicializando vacío');
-            localStorage.setItem('listaJugadores', JSON.stringify([]));
-            setJugadores([]);
-        }
+        cargarJugadores();
     }, []);
+
+    const cargarJugadores = async () => {
+        setLoading(true);
+        try {
+            const data = await jugadorService.getAll();
+            console.log('✅ Jugadores cargados desde el servidor (Home):', data);
+            setJugadores(data);
+        } catch (error) {
+            console.error('❌ Error cargando jugadores (Home):', error);
+            // Si hay error, intentar cargar desde localStorage como fallback
+            const localData = localStorage.getItem('listaJugadores');
+            if (localData) {
+                console.log('📦 Usando datos de localStorage como fallback');
+                setJugadores(JSON.parse(localData));
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const jugadoresFiltrados = jugadores.filter(jugador => {
         const matchesNombre = jugador.nombre.toLowerCase().includes(busqueda.toLowerCase());
@@ -86,10 +96,28 @@ const Home = () => {
                         </button>
                     ))}
                 </div>
+
+                <button
+                    onClick={cargarJugadores}
+                    className="val-btn secondary"
+                    style={{
+                        width: 'auto',
+                        padding: '10px 18px',
+                        fontSize: '12px',
+                        letterSpacing: '0.5px'
+                    }}
+                    disabled={loading}
+                >
+                    {loading ? '🔄 CARGANDO...' : '🔄 RECARGAR'}
+                </button>
             </div>
 
             <div className="grid-jugadores">
-                {jugadoresFiltrados.length > 0 ? (
+                {loading ? (
+                    <div className="empty-message-container">
+                        <p className="empty-message">⏳ Cargando jugadores desde el servidor...</p>
+                    </div>
+                ) : jugadoresFiltrados.length > 0 ? (
                     jugadoresFiltrados.map((jugador) => (
                         <div key={jugador.id} className={`card-jugador tier-${jugador.tier}`}>
                             <div className="card-image-wrapper">

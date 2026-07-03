@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { jugadorService } from './services/jugadorService';
 import './Admin.css';
 
 const Admin = () => {
@@ -9,22 +10,26 @@ const Admin = () => {
     const [foto, setFoto] = useState('');
     const [jugadores, setJugadores] = useState([]);
     const [editingId, setEditingId] = useState(null);
+    const [loading, setLoading] = useState(false);
 
+    // Cargar jugadores desde el backend
     useEffect(() => {
-        console.log('🔄 Admin - useEffect ejecutado');
-        const data = localStorage.getItem('listaJugadores');
-        console.log('📦 Datos en localStorage:', data);
-
-        if (data) {
-            const parsedData = JSON.parse(data);
-            console.log('✅ Datos parseados:', parsedData);
-            setJugadores(parsedData);
-        } else {
-            console.log('⚠️ No hay datos en localStorage, inicializando vacío');
-            localStorage.setItem('listaJugadores', JSON.stringify([]));
-            setJugadores([]);
-        }
+        cargarJugadores();
     }, []);
+
+    const cargarJugadores = async () => {
+        setLoading(true);
+        try {
+            const data = await jugadorService.getAll();
+            console.log('✅ Jugadores cargados desde el servidor:', data);
+            setJugadores(data);
+        } catch (error) {
+            console.error('❌ Error cargando jugadores:', error);
+            alert('Error al cargar los jugadores. Asegúrate que el servidor esté corriendo.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleLogin = (e) => {
         e.preventDefault();
@@ -35,7 +40,7 @@ const Admin = () => {
         }
     };
 
-    const handleGuardar = (e) => {
+    const handleGuardar = async (e) => {
         e.preventDefault();
 
         if (!nombre.trim() || !foto.trim()) {
@@ -43,35 +48,32 @@ const Admin = () => {
             return;
         }
 
-        console.log('💾 Guardando jugador...');
-        console.log('📝 Datos del formulario:', { nombre, tier, foto, editingId });
+        setLoading(true);
+        try {
+            if (editingId) {
+                // Actualizar jugador existente
+                await jugadorService.update(editingId, { nombre, tier, foto });
+                alert('✅ Jugador actualizado correctamente');
+            } else {
+                // Crear nuevo jugador
+                await jugadorService.create({ nombre, tier, foto });
+                alert('✅ Jugador guardado correctamente');
+            }
 
-        const lista = JSON.parse(localStorage.getItem('listaJugadores') || '[]');
-        console.log('📋 Lista actual en localStorage:', lista);
+            // Recargar la lista de jugadores
+            await cargarJugadores();
 
-        let nuevaLista;
-
-        if (editingId) {
-            nuevaLista = lista.map(j => j.id === editingId ? { ...j, nombre, tier, foto } : j);
-            console.log('✏️ Editando jugador ID:', editingId);
-        } else {
-            const nuevoJugador = { id: Date.now(), nombre, tier, foto };
-            nuevaLista = [...lista, nuevoJugador];
-            console.log('➕ Nuevo jugador creado:', nuevoJugador);
+            // Resetear formulario
+            setNombre('');
+            setTier(1);
+            setFoto('');
+            setEditingId(null);
+        } catch (error) {
+            console.error('❌ Error al guardar:', error);
+            alert('Error al guardar el jugador: ' + error.message);
+        } finally {
+            setLoading(false);
         }
-
-        console.log('💾 Guardando en localStorage:', nuevaLista);
-        localStorage.setItem('listaJugadores', JSON.stringify(nuevaLista));
-        setJugadores(nuevaLista);
-        console.log('✅ Estado actualizado:', nuevaLista);
-
-        // Resetear formulario
-        setNombre('');
-        setTier(1);
-        setFoto('');
-        setEditingId(null);
-
-        alert(editingId ? 'Jugador actualizado correctamente' : 'Jugador guardado correctamente');
     };
 
     const handleEditClick = (jugador) => {
@@ -88,15 +90,22 @@ const Admin = () => {
         setEditingId(null);
     };
 
-    const handleEliminar = (id) => {
+    const handleEliminar = async (id) => {
         if (window.confirm('¿Estás seguro de que deseas eliminar este jugador?')) {
-            const lista = JSON.parse(localStorage.getItem('listaJugadores') || '[]');
-            const nuevaLista = lista.filter(j => j.id !== id);
-            localStorage.setItem('listaJugadores', JSON.stringify(nuevaLista));
-            setJugadores(nuevaLista);
+            setLoading(true);
+            try {
+                await jugadorService.delete(id);
+                alert('✅ Jugador eliminado correctamente');
+                await cargarJugadores();
 
-            if (editingId === id) {
-                handleCancelEdit();
+                if (editingId === id) {
+                    handleCancelEdit();
+                }
+            } catch (error) {
+                console.error('❌ Error al eliminar:', error);
+                alert('Error al eliminar el jugador: ' + error.message);
+            } finally {
+                setLoading(false);
             }
         }
     };
@@ -132,6 +141,14 @@ const Admin = () => {
             <header className="admin-header">
                 <h1>PANEL DE CONTROL</h1>
                 <p>Gestionar jugadores, tiers y avatares del sistema</p>
+                <button
+                    onClick={cargarJugadores}
+                    className="val-btn secondary"
+                    style={{ marginTop: '10px', width: 'auto', padding: '8px 16px' }}
+                    disabled={loading}
+                >
+                    {loading ? '🔄 Cargando...' : '🔄 Recargar'}
+                </button>
             </header>
 
             <div className="admin-grid">
@@ -146,12 +163,17 @@ const Admin = () => {
                                 value={nombre}
                                 onChange={(e) => setNombre(e.target.value)}
                                 required
+                                disabled={loading}
                             />
                         </div>
 
                         <div className="form-group">
                             <label>TIER DE HABILIDAD</label>
-                            <select value={tier} onChange={(e) => setTier(parseInt(e.target.value))}>
+                            <select
+                                value={tier}
+                                onChange={(e) => setTier(parseInt(e.target.value))}
+                                disabled={loading}
+                            >
                                 <option value={0}>Tier S (Dios / Top)</option>
                                 {[1, 2, 3, 4, 5].map(t => (
                                     <option key={t} value={t}>Tier {t} {t === 1 ? '(Elite)' : t === 5 ? '(Recluta)' : ''}</option>
@@ -167,15 +189,16 @@ const Admin = () => {
                                 value={foto}
                                 onChange={(e) => setFoto(e.target.value)}
                                 required
+                                disabled={loading}
                             />
                         </div>
 
                         <div className="form-actions">
-                            <button type="submit" className="val-btn">
-                                {editingId ? 'ACTUALIZAR' : 'GUARDAR JUGADOR'}
+                            <button type="submit" className="val-btn" disabled={loading}>
+                                {loading ? '⏳ PROCESANDO...' : (editingId ? 'ACTUALIZAR' : 'GUARDAR JUGADOR')}
                             </button>
                             {editingId && (
-                                <button type="button" className="val-btn secondary" onClick={handleCancelEdit}>
+                                <button type="button" className="val-btn secondary" onClick={handleCancelEdit} disabled={loading}>
                                     CANCELAR
                                 </button>
                             )}
@@ -185,6 +208,7 @@ const Admin = () => {
 
                 <div className="admin-table-card">
                     <h2>AGENTES REGISTRADOS ({jugadores.length})</h2>
+                    {loading && <p style={{ color: '#8899aa' }}>⏳ Cargando...</p>}
                     <div className="table-responsive">
                         <table className="admin-table">
                             <thead>
@@ -224,6 +248,7 @@ const Admin = () => {
                                                         className="action-btn edit-btn"
                                                         onClick={() => handleEditClick(jugador)}
                                                         title="Editar agente"
+                                                        disabled={loading}
                                                     >
                                                         ✏️
                                                     </button>
@@ -231,6 +256,7 @@ const Admin = () => {
                                                         className="action-btn delete-btn"
                                                         onClick={() => handleEliminar(jugador.id)}
                                                         title="Eliminar agente"
+                                                        disabled={loading}
                                                     >
                                                         🗑️
                                                     </button>
@@ -240,7 +266,9 @@ const Admin = () => {
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="4" className="table-empty-msg">No hay jugadores registrados en el sistema.</td>
+                                        <td colSpan="4" className="table-empty-msg">
+                                            {loading ? 'Cargando jugadores...' : 'No hay jugadores registrados en el sistema.'}
+                                        </td>
                                     </tr>
                                 )}
                             </tbody>
