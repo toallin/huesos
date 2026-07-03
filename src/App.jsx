@@ -1,21 +1,24 @@
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Admin from './pages/Admin';
+import ArmarTeam from './pages/ArmarTeam';
+import Navbar from './components/Navbar';
+import './App.css';
 
 function App() {
   return (
     <BrowserRouter>
-      {/* Navbar básica para navegar */}
-      <nav style={{ padding: '10px', borderBottom: '1px solid #ccc' }}>
-        <Link to="/" style={{ marginRight: '15px' }}>Inicio</Link>
-        <Link to="/admin">Admin</Link>
-      </nav>
+      {/* Navbar de estilo Valorant */}
+      <Navbar />
 
-      {/* Definición de rutas */}
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/admin" element={<Admin />} />
-      </Routes>
+      {/* Contenedor principal de la app */}
+      <div className="app-content">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/armar" element={<ArmarTeam />} />
+          <Route path="/admin" element={<Admin />} />
+        </Routes>
+      </div>
     </BrowserRouter>
   );
 }

@@ -1,31 +1,128 @@
 import { useState, useEffect } from 'react';
+import './Home.css';
+
+const defaultJugadores = [
+  { id: 1, nombre: 'Wallace', tier: 0, foto: 'https://images.unsplash.com/photo-1560169897-fc0cdbdfa4d5?q=80&w=300&auto=format&fit=crop' },
+  { id: 2, nombre: 'Mixwell', tier: 1, foto: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=300&auto=format&fit=crop' },
+  { id: 3, nombre: 'TenZ', tier: 0, foto: 'https://images.unsplash.com/photo-1553481187-be93c21490a9?q=80&w=300&auto=format&fit=crop' },
+  { id: 4, nombre: 'Aspas', tier: 2, foto: 'https://images.unsplash.com/photo-1612287230202-1bf1d85d1bdf?q=80&w=300&auto=format&fit=crop' },
+  { id: 5, nombre: 'Derke', tier: 2, foto: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=300&auto=format&fit=crop' },
+  { id: 6, nombre: 'Shao', tier: 3, foto: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=300&auto=format&fit=crop' },
+  { id: 7, nombre: 'Suygetsu', tier: 3, foto: 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=300&auto=format&fit=crop' },
+  { id: 8, nombre: 'Boaster', tier: 4, foto: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?q=80&w=300&auto=format&fit=crop' },
+  { id: 9, nombre: 'Chronicle', tier: 4, foto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=300&auto=format&fit=crop' },
+  { id: 10, nombre: 'Ange1', tier: 5, foto: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?q=80&w=300&auto=format&fit=crop' },
+];
 
 const Home = () => {
     const [jugadores, setJugadores] = useState([]);
+    const [busqueda, setBusqueda] = useState('');
+    const [tierFiltro, setTierFiltro] = useState('todos');
 
-    // Cargar los datos desde localStorage al montar el componente
     useEffect(() => {
         const data = localStorage.getItem('listaJugadores');
         if (data) {
             setJugadores(JSON.parse(data));
+        } else {
+            // Guardamos valores por defecto si está vacío para que se vea genial al iniciar
+            localStorage.setItem('listaJugadores', JSON.stringify(defaultJugadores));
+            setJugadores(defaultJugadores);
         }
     }, []);
 
+    const jugadoresFiltrados = jugadores.filter(jugador => {
+        const matchesNombre = jugador.nombre.toLowerCase().includes(busqueda.toLowerCase());
+        const matchesTier = tierFiltro === 'todos' || jugador.tier === parseInt(tierFiltro);
+        return matchesNombre && matchesTier;
+    });
+
     return (
         <div className="home-container">
-            <h1>Lista de Jugadores - Salas Mixtone</h1>
+            <header className="home-header">
+                <h1>AGENTES REGISTRADOS</h1>
+                <p className="home-subtitle">Lista de jugadores para el draft de salas mixtas</p>
+                
+                <div className="stats-bar">
+                    <div className="stat-card">
+                        <span className="stat-value">{jugadores.length}</span>
+                        <span className="stat-label">TOTAL JUGADORES</span>
+                    </div>
+                    <div className="stat-card">
+                        <span className="stat-value">{jugadores.filter(j => j.tier === 0).length}</span>
+                        <span className="stat-label">TIER S (DIOS)</span>
+                    </div>
+                    <div className="stat-card">
+                        <span className="stat-value">{jugadores.filter(j => j.tier === 1).length}</span>
+                        <span className="stat-label">TIER 1 (ELITE)</span>
+                    </div>
+                </div>
+            </header>
+
+            <div className="filters-container">
+                <div className="search-box">
+                    <span className="search-icon">🔍</span>
+                    <input 
+                        type="text" 
+                        placeholder="BUSCAR JUGADOR..." 
+                        value={busqueda} 
+                        onChange={(e) => setBusqueda(e.target.value)} 
+                    />
+                </div>
+                
+                <div className="tier-filter-buttons">
+                    <button 
+                        className={tierFiltro === 'todos' ? 'val-btn active' : 'val-btn secondary'} 
+                        onClick={() => setTierFiltro('todos')}
+                    >
+                        TODOS
+                    </button>
+                    <button 
+                        className={tierFiltro === '0' ? 'val-btn active' : 'val-btn secondary'} 
+                        style={tierFiltro === '0' ? { backgroundColor: `var(--tier-0)`, borderColor: `var(--tier-0)` } : {}}
+                        onClick={() => setTierFiltro('0')}
+                    >
+                        TIER S
+                    </button>
+                    {[1, 2, 3, 4, 5].map(t => (
+                        <button 
+                            key={t}
+                            className={tierFiltro === String(t) ? 'val-btn active' : 'val-btn secondary'} 
+                            style={tierFiltro === String(t) ? { backgroundColor: `var(--tier-${t})`, borderColor: `var(--tier-${t})` } : {}}
+                            onClick={() => setTierFiltro(String(t))}
+                        >
+                            TIER {t}
+                        </button>
+                    ))}
+                </div>
+            </div>
 
             <div className="grid-jugadores">
-                {jugadores.length > 0 ? (
-                    jugadores.map((jugador) => (
+                {jugadoresFiltrados.length > 0 ? (
+                    jugadoresFiltrados.map((jugador) => (
                         <div key={jugador.id} className={`card-jugador tier-${jugador.tier}`}>
-                            <img src={jugador.foto} alt={jugador.nombre} style={{ width: '100px' }} />
-                            <h3>{jugador.nombre}</h3>
-                            <p>Tier: {jugador.tier}</p>
+                            <div className="card-image-wrapper">
+                                <img src={jugador.foto} alt={jugador.nombre} onError={(e) => {
+                                    e.target.src = 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=300&auto=format&fit=crop';
+                                }} />
+                                <div className="card-tier-badge" style={{ backgroundColor: `var(--tier-${jugador.tier})` }}>
+                                    {jugador.tier === 0 ? 'TIER S' : `TIER ${jugador.tier}`}
+                                </div>
+                            </div>
+
+                            <div className="info-container">
+                                <h3>{jugador.nombre}</h3>
+                                <div className="card-footer-lines">
+                                    <span className="card-role-label">AGENTE MIXTONE</span>
+                                    <span className="card-tech-id">#{jugador.id.toString().slice(-4)}</span>
+                                </div>
+                            </div>
+                            <div className="card-edge-cut"></div>
                         </div>
                     ))
                 ) : (
-                    <p>No hay jugadores registrados todavía.</p>
+                    <div className="empty-message-container">
+                        <p className="empty-message">No se encontraron agentes con los filtros actuales.</p>
+                    </div>
                 )}
             </div>
         </div>
