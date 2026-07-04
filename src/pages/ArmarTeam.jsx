@@ -4,6 +4,7 @@ import './ArmarTeam.css';
 
 const ADMIN_PASSWORD = 'AdminMixtoneVandal2026_Secure#';
 const MAX_POR_EQUIPO = 5;
+const MAX_EQUIPOS = 10;
 
 const TEAM_COLORS = [
     '#ff4655', // Rojo Carmesí
@@ -22,22 +23,21 @@ const ArmarTeam = () => {
     const [jugadores, setJugadores] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    // ── Admin auth ──
+    // Admin auth
     const [adminLogueado, setAdminLogueado] = useState(false);
     const [passInput, setPassInput] = useState('');
     const [mostrarLoginAdmin, setMostrarLoginAdmin] = useState(false);
 
-    // ── Draft state ──
-    const [numEquipos, setNumEquipos] = useState(2);
-    const [fase, setFase] = useState('configuracion');
-    const [capitanes, setCapitanes] = useState([]);
+    // Draft state
     const [equipos, setEquipos] = useState([]);
-    const [turnoDeIndex, setTurnoDeIndex] = useState(0);
+    const [fase, setFase] = useState('configuracion'); // 'configuracion' | 'seleccion' | 'listo'
+    const [jugadorSeleccionado, setJugadorSeleccionado] = useState(null); // Jugador que el admin seleccionó para asignar
+    const [jugadoresSeleccionados, setJugadoresSeleccionados] = useState([]);
 
-    // ── Matchup state ──
+    // Matchup state
     const [matchups, setMatchups] = useState(null);
 
-    // Cargar jugadores desde el backend
+    // Cargar jugadores
     useEffect(() => {
         cargarJugadores();
     }, []);
@@ -46,14 +46,11 @@ const ArmarTeam = () => {
         setLoading(true);
         try {
             const data = await jugadorService.getAll();
-            console.log('✅ Jugadores cargados (ArmarTeam):', data);
             setJugadores(data);
         } catch (error) {
-            console.error('❌ Error cargando jugadores (ArmarTeam):', error);
-            // Fallback a localStorage
+            console.error('Error cargando jugadores:', error);
             const localData = localStorage.getItem('listaJugadores');
             if (localData) {
-                console.log('📦 Usando datos de localStorage como fallback');
                 setJugadores(JSON.parse(localData));
             }
         } finally {
@@ -61,7 +58,7 @@ const ArmarTeam = () => {
         }
     };
 
-    // ── Auth helpers ──
+    // Auth
     const handleLoginAdmin = (e) => {
         e.preventDefault();
         if (passInput === ADMIN_PASSWORD) {
@@ -76,95 +73,198 @@ const ArmarTeam = () => {
 
     const handleLogoutAdmin = () => {
         setAdminLogueado(false);
-        setCapitanes([]);
+        resetDraft();
+    };
+
+    const resetDraft = () => {
         setEquipos([]);
-        setTurnoDeIndex(0);
         setFase('configuracion');
         setMatchups(null);
+        setJugadoresSeleccionados([]);
+        setJugadorSeleccionado(null);
     };
 
-    // ── Draft helpers ──
-    const estaSeleccionado = (id) => {
-        return capitanes.some(c => c && c.id === id) ||
-            equipos.some(eq => eq.some(j => j.id === id));
+    // ── Funciones del Draft ──
+
+    // Agregar nuevo equipo
+    const agregarEquipo = () => {
+        if (equipos.length >= MAX_EQUIPOS) {
+            alert(`Máximo ${MAX_EQUIPOS} equipos permitidos`);
+            return;
+        }
+
+        setEquipos([...equipos, {
+            capitan: null,
+            miembros: [],
+            nombre: `EQUIPO ${equipos.length + 1}`
+        }]);
     };
 
-    const equipoLleno = (idx) => {
-        const cap = capitanes[idx];
-        const miembros = equipos[idx] || [];
-        return cap && miembros.length >= MAX_POR_EQUIPO - 1;
+    // Eliminar equipo
+    const eliminarEquipo = (idx) => {
+        const equipo = equipos[idx];
+        if (equipo.capitan || equipo.miembros.length > 0) {
+            alert('No puedes eliminar un equipo que tiene jugadores');
+            return;
+        }
+        const nuevosEquipos = equipos.filter((_, i) => i !== idx);
+        setEquipos(nuevosEquipos);
     };
 
-    const todosLlenos = () => {
-        return Array.from({ length: capitanes.length }).every((_, idx) => equipoLleno(idx));
+    // Seleccionar un jugador del pool (para asignarlo a un equipo)
+    const seleccionarJugadorPool = (jugador) => {
+        if (!adminLogueado) return;
+        if (fase === 'listo') return;
+        if (jugadoresSeleccionados.includes(jugador.id)) {
+            alert('Este jugador ya está en un equipo');
+            return;
+        }
+
+        // Si el jugador ya está seleccionado, lo deseleccionamos
+        if (jugadorSeleccionado?.id === jugador.id) {
+            setJugadorSeleccionado(null);
+            return;
+        }
+
+        setJugadorSeleccionado(jugador);
     };
 
-    const handleSeleccionarJugador = (jugador) => {
-        if (estaSeleccionado(jugador.id)) return;
+    // Asignar jugador seleccionado a un equipo
+    const asignarJugadorAEquipo = (equipoIdx, esCapitan = false) => {
+        if (!jugadorSeleccionado) {
+            alert('Primero selecciona un jugador del pool');
+            return;
+        }
 
-        if (fase === 'capitanes') {
-            const nuevoCapitanes = [...capitanes];
-            const primerVacioIdx = nuevoCapitanes.indexOf(null);
-            if (primerVacioIdx !== -1) {
-                nuevoCapitanes[primerVacioIdx] = jugador;
-                setCapitanes(nuevoCapitanes);
-                if (!nuevoCapitanes.some(c => c === null)) {
-                    setFase('draft');
-                    setTurnoDeIndex(0);
-                }
+        if (jugadoresSeleccionados.includes(jugadorSeleccionado.id)) {
+            alert('Este jugador ya está en un equipo');
+            setJugadorSeleccionado(null);
+            return;
+        }
+
+        const equipo = equipos[equipoIdx];
+        if (!equipo) return;
+
+        const totalMiembros = (equipo.capitan ? 1 : 0) + equipo.miembros.length;
+
+        if (esCapitan) {
+            if (equipo.capitan) {
+                alert('Este equipo ya tiene capitán');
+                return;
             }
-        } else if (fase === 'draft') {
-            let intentos = 0;
-            let idx = turnoDeIndex;
-            while (intentos < capitanes.length) {
-                if (!equipoLleno(idx)) {
-                    const nuevosEquipos = equipos.map((eq, i) =>
-                        i === idx ? [...eq, jugador] : eq
-                    );
-                    setEquipos(nuevosEquipos);
-                    let siguienteIdx = (idx + 1) % capitanes.length;
-                    setTurnoDeIndex(siguienteIdx);
+            const nuevosEquipos = [...equipos];
+            nuevosEquipos[equipoIdx].capitan = jugadorSeleccionado;
+            setEquipos(nuevosEquipos);
+            setJugadoresSeleccionados([...jugadoresSeleccionados, jugadorSeleccionado.id]);
+            setJugadorSeleccionado(null);
+        } else {
+            if (totalMiembros >= MAX_POR_EQUIPO) {
+                alert(`El equipo ya tiene ${MAX_POR_EQUIPO} jugadores`);
+                return;
+            }
+            if (!equipo.capitan) {
+                alert('Este equipo no tiene capitán. Asigna un capitán primero.');
+                return;
+            }
+            const nuevosEquipos = [...equipos];
+            nuevosEquipos[equipoIdx].miembros.push(jugadorSeleccionado);
+            setEquipos(nuevosEquipos);
+            setJugadoresSeleccionados([...jugadoresSeleccionados, jugadorSeleccionado.id]);
+            setJugadorSeleccionado(null);
+        }
+
+        // Verificar si todos los equipos están completos
+        const todosLlenos = equipos.every(eq => {
+            const total = (eq.capitan ? 1 : 0) + eq.miembros.length;
+            return total === MAX_POR_EQUIPO;
+        });
+        if (todosLlenos && equipos.length >= 2) {
+            setFase('listo');
+        }
+    };
+
+    // Remover jugador de un equipo
+    const removerJugador = (equipoIdx, jugadorId, esCapitan = false) => {
+        if (!adminLogueado) return;
+        if (fase === 'listo') return;
+
+        const nuevosEquipos = [...equipos];
+        if (esCapitan) {
+            nuevosEquipos[equipoIdx].capitan = null;
+        } else {
+            nuevosEquipos[equipoIdx].miembros = nuevosEquipos[equipoIdx].miembros.filter(j => j.id !== jugadorId);
+        }
+        setEquipos(nuevosEquipos);
+        setJugadoresSeleccionados(prev => prev.filter(id => id !== jugadorId));
+    };
+
+    // Auto-draft (opcional)
+    const handleAutodraft = () => {
+        if (fase === 'listo') return;
+
+        const disponibles = jugadores.filter(j => !jugadoresSeleccionados.includes(j.id));
+        if (disponibles.length === 0) return;
+
+        // Primero, asegurar que todos los equipos tengan capitán
+        let nuevosEquipos = equipos.map(eq => ({ ...eq, miembros: [...eq.miembros] }));
+        let nuevosSeleccionados = [...jugadoresSeleccionados];
+        let disponiblesRestantes = [...disponibles];
+
+        // Asignar capitanes a equipos sin capitán
+        nuevosEquipos.forEach((eq, idx) => {
+            if (!eq.capitan && disponiblesRestantes.length > 0) {
+                const jugador = disponiblesRestantes.shift();
+                eq.capitan = jugador;
+                nuevosSeleccionados.push(jugador.id);
+            }
+        });
+
+        // Llenar el resto de los equipos
+        disponiblesRestantes.forEach(jugador => {
+            for (let i = 0; i < nuevosEquipos.length; i++) {
+                const total = (nuevosEquipos[i].capitan ? 1 : 0) + nuevosEquipos[i].miembros.length;
+                if (total < MAX_POR_EQUIPO) {
+                    nuevosEquipos[i].miembros.push(jugador);
+                    nuevosSeleccionados.push(jugador.id);
                     break;
                 }
-                idx = (idx + 1) % capitanes.length;
-                intentos++;
             }
+        });
+
+        setEquipos(nuevosEquipos);
+        setJugadoresSeleccionados(nuevosSeleccionados);
+        setJugadorSeleccionado(null);
+
+        // Verificar si todos están llenos
+        const todosLlenos = nuevosEquipos.every(eq => {
+            const total = (eq.capitan ? 1 : 0) + eq.miembros.length;
+            return total === MAX_POR_EQUIPO;
+        });
+        if (todosLlenos && nuevosEquipos.length >= 2) {
+            setFase('listo');
         }
     };
 
-    const handleComenzarDraft = () => {
-        const parsedNum = parseInt(numEquipos);
-        if (isNaN(parsedNum) || parsedNum < 2) {
-            alert('Mínimo 2 equipos.');
-            return;
-        }
-        if (parsedNum > jugadores.length) {
-            alert(`No hay suficientes jugadores (${jugadores.length}) para ${parsedNum} capitanes.`);
-            return;
-        }
-        setCapitanes(Array(parsedNum).fill(null));
-        setEquipos(Array.from({ length: parsedNum }, () => []));
-        setTurnoDeIndex(0);
-        setFase('capitanes');
-    };
-
-    const handleReiniciarTodo = () => {
-        setCapitanes([]);
-        setEquipos([]);
-        setTurnoDeIndex(0);
-        setFase('configuracion');
-        setMatchups(null);
-    };
-
+    // Generar enfrentamientos
     const handleEnfrentamientoRandom = () => {
-        const todosEquipos = capitanes.map((cap, idx) => ({
-            nombre: `EQUIPO ${idx + 1}`,
+        const todosLlenos = equipos.every(eq => {
+            const total = (eq.capitan ? 1 : 0) + eq.miembros.length;
+            return total === MAX_POR_EQUIPO;
+        });
+
+        if (!todosLlenos) {
+            alert('Todos los equipos deben estar completos (5 jugadores)');
+            return;
+        }
+
+        const equiposCompletos = equipos.map((eq, idx) => ({
+            nombre: eq.nombre || `EQUIPO ${idx + 1}`,
             color: TEAM_COLORS[idx % TEAM_COLORS.length],
-            capitan: cap,
-            miembros: equipos[idx] || [],
+            capitan: eq.capitan,
+            miembros: eq.miembros,
         }));
 
-        const mezclados = [...todosEquipos].sort(() => Math.random() - 0.5);
+        const mezclados = [...equiposCompletos].sort(() => Math.random() - 0.5);
         const pares = [];
         for (let i = 0; i + 1 < mezclados.length; i += 2) {
             pares.push([mezclados[i], mezclados[i + 1]]);
@@ -175,70 +275,22 @@ const ArmarTeam = () => {
         setMatchups(pares);
     };
 
-    const handleAutodraft = () => {
-        if (fase !== 'draft') return;
-        const disponibles = jugadores.filter(j => !estaSeleccionado(j.id));
-        if (disponibles.length === 0) return;
-
-        const mezclados = [...disponibles].sort(() => Math.random() - 0.5);
-        let currentTurnIdx = turnoDeIndex;
-        let nuevosEquipos = equipos.map(eq => [...eq]);
-
-        mezclados.forEach(jugador => {
-            let intentos = 0;
-            while (intentos < capitanes.length) {
-                const miembros = nuevosEquipos[currentTurnIdx];
-                if (capitanes[currentTurnIdx] && miembros.length < MAX_POR_EQUIPO - 1) {
-                    nuevosEquipos[currentTurnIdx].push(jugador);
-                    currentTurnIdx = (currentTurnIdx + 1) % capitanes.length;
-                    break;
-                }
-                currentTurnIdx = (currentTurnIdx + 1) % capitanes.length;
-                intentos++;
-            }
-        });
-
-        setEquipos(nuevosEquipos);
-        setTurnoDeIndex(currentTurnIdx);
-    };
-
     // ── Instruction bar ──
     const getInstruccion = () => {
         if (!adminLogueado) {
-            return (
-                <div className="draft-instruction-bar view-only">
-                    👁️ MODO VISTA — SOLO EL ADMIN PUEDE ARMAR EQUIPOS
-                </div>
-            );
+            return <div className="draft-instruction-bar view-only">👁️ MODO VISTA — SOLO EL ADMIN PUEDE ARMAR EQUIPOS</div>;
         }
         if (fase === 'configuracion') {
             return (
                 <div className="draft-instruction-bar setup-phase">
-                    INGRESA LA CANTIDAD DE EQUIPOS PARA LA ARENA
+                    🏆 1. SELECCIONA UN JUGADOR → 2. ASÍGNALO COMO CAPITÁN A UN EQUIPO
                 </div>
             );
         }
-        if (fase === 'capitanes') {
-            const primerVacioIdx = capitanes.indexOf(null);
-            const teamColor = TEAM_COLORS[primerVacioIdx % TEAM_COLORS.length];
-            return (
-                <div className="draft-instruction-bar choose-cap" style={{ '--team-color': teamColor }}>
-                    <span className="pulse-dot"></span>
-                    SELECCIONA AL <strong className="cap-highlight">CAPITÁN {primerVacioIdx + 1}</strong> DEL POOL
-                </div>
-            );
+        if (fase === 'listo') {
+            return <div className="draft-instruction-bar finished">✅ EQUIPOS COMPLETOS — LISTOS PARA ENFRENTAR</div>;
         }
-        if (todosLlenos()) {
-            return <div className="draft-instruction-bar finished">✅ DRAFT COMPLETO — EQUIPOS FORMADOS</div>;
-        }
-        const capTurno = capitanes[turnoDeIndex];
-        const teamColor = TEAM_COLORS[turnoDeIndex % TEAM_COLORS.length];
-        return (
-            <div className="draft-instruction-bar active-turn" style={{ '--team-color': teamColor }}>
-                <span className="pulse-dot"></span>
-                TURNO: <strong className="cap-highlight">{capTurno?.nombre}</strong> (CAPITÁN {turnoDeIndex + 1})
-            </div>
-        );
+        return null;
     };
 
     if (loading) {
@@ -253,13 +305,12 @@ const ArmarTeam = () => {
 
     return (
         <div className="draft-page-container">
-            {/* ── Header ── */}
+            {/* Header */}
             <header className="draft-header">
                 <h1>SALA DE DRAFT</h1>
                 <p className="draft-subtitle">Arma tus escuadras de 5 — estilo CS2</p>
                 {getInstruccion()}
 
-                {/* Botón recargar */}
                 <button
                     onClick={cargarJugadores}
                     className="val-btn secondary"
@@ -276,7 +327,6 @@ const ArmarTeam = () => {
                     🔄 RECARGAR
                 </button>
 
-                {/* Admin auth button top-right */}
                 <div className="admin-auth-bar">
                     {adminLogueado ? (
                         <button className="val-btn secondary auth-btn" onClick={handleLogoutAdmin}>
@@ -289,7 +339,6 @@ const ArmarTeam = () => {
                     )}
                 </div>
 
-                {/* Login dropdown */}
                 {mostrarLoginAdmin && !adminLogueado && (
                     <div className="admin-login-dropdown">
                         <form onSubmit={handleLoginAdmin} className="admin-login-form">
@@ -310,48 +359,41 @@ const ArmarTeam = () => {
                 )}
             </header>
 
-            {/* ── Pool de Agentes (siempre visible) ── */}
+            {/* Pool de Agentes */}
             <div className="players-pool-panel">
                 <div className="pool-header">
                     <h2>
                         POOL DE AGENTES
                         <span className="pool-count-badge">
-                            {jugadores.filter(j => !estaSeleccionado(j.id)).length} DISPONIBLES / {jugadores.length} TOTAL
+                            {jugadores.filter(j => !jugadoresSeleccionados.includes(j.id)).length} DISPONIBLES / {jugadores.length} TOTAL
                         </span>
+                        {jugadorSeleccionado && (
+                            <span className="selected-indicator" style={{ color: '#00ff88', marginLeft: '15px' }}>
+                                ✅ SELECCIONADO: {jugadorSeleccionado.nombre}
+                            </span>
+                        )}
                     </h2>
-                    {adminLogueado && fase !== 'configuracion' && (
-                        <div className="pool-actions">
-                            {fase === 'draft' && !todosLlenos() && jugadores.filter(j => !estaSeleccionado(j.id)).length > 0 && (
-                                <button className="val-btn secondary" onClick={handleAutodraft}>
-                                    AUTO-DRAFT RESTANTES
-                                </button>
-                            )}
-                            <button className="val-btn reset-btn" onClick={handleReiniciarTodo}>
-                                ⚙️ CONFIGURACIÓN
-                            </button>
-                        </div>
+                    {adminLogueado && fase !== 'listo' && (
+                        <button className="val-btn secondary" onClick={handleAutodraft}>
+                            ⚡ AUTO-DRAFT
+                        </button>
                     )}
                 </div>
 
                 <div className="pool-grid">
                     {jugadores.map((jugador) => {
-                        const seleccionado = estaSeleccionado(jugador.id);
-                        let label = '';
-                        const capIdx = capitanes.findIndex(c => c && c.id === jugador.id);
-                        if (capIdx !== -1) {
-                            label = `CAP ${capIdx + 1}`;
-                        } else {
-                            const eqIdx = equipos.findIndex(eq => eq.some(j => j.id === jugador.id));
-                            if (eqIdx !== -1) label = `EQ ${eqIdx + 1}`;
-                        }
-
-                        const bloqueado = !adminLogueado || seleccionado;
+                        const seleccionado = jugadoresSeleccionados.includes(jugador.id);
+                        const esJugadorSeleccionado = jugadorSeleccionado?.id === jugador.id;
+                        const habilitado = adminLogueado && !seleccionado && fase !== 'listo';
 
                         return (
                             <div
                                 key={jugador.id}
-                                className={`pool-card-item tier-${jugador.tier} ${seleccionado ? 'dark-selected' : ''} ${!adminLogueado ? 'no-admin' : ''}`}
-                                onClick={() => !bloqueado && handleSeleccionarJugador(jugador)}
+                                className={`pool-card-item tier-${jugador.tier} 
+                                    ${seleccionado ? 'dark-selected' : ''} 
+                                    ${esJugadorSeleccionado ? 'selected-active' : ''} 
+                                    ${habilitado ? 'habilitado' : 'deshabilitado'}`}
+                                onClick={() => habilitado && seleccionarJugadorPool(jugador)}
                             >
                                 <div className="pool-card-img-wrapper">
                                     <img
@@ -361,7 +403,17 @@ const ArmarTeam = () => {
                                     />
                                     {seleccionado && (
                                         <div className="card-selected-overlay">
-                                            <span className="overlay-badge">{label}</span>
+                                            <span className="overlay-badge">
+                                                {equipos.findIndex(eq => eq.capitan?.id === jugador.id) !== -1 ?
+                                                    `CAP ${equipos.findIndex(eq => eq.capitan?.id === jugador.id) + 1}` :
+                                                    `EQ ${equipos.findIndex(eq => eq.miembros.some(m => m.id === jugador.id)) + 1}`
+                                                }
+                                            </span>
+                                        </div>
+                                    )}
+                                    {esJugadorSeleccionado && (
+                                        <div className="card-selected-overlay" style={{ background: 'rgba(0, 255, 136, 0.2)' }}>
+                                            <span className="overlay-badge" style={{ borderColor: '#00ff88', color: '#00ff88' }}>SELECCIONADO</span>
                                         </div>
                                     )}
                                     <div className="pool-card-tier" style={{ backgroundColor: `var(--tier-${jugador.tier})` }}>
@@ -371,7 +423,9 @@ const ArmarTeam = () => {
                                 <div className="pool-card-info">
                                     <h3>{jugador.nombre}</h3>
                                     <span className="pool-card-status">
-                                        {seleccionado ? 'SELECCIONADO' : adminLogueado ? 'DISPONIBLE' : 'VISTA'}
+                                        {seleccionado ? '✅ EN EQUIPO' :
+                                            esJugadorSeleccionado ? '🟢 SELECCIONADO' :
+                                                (habilitado ? '🟡 DISPONIBLE' : '⚫ DESHABILITADO')}
                                     </span>
                                 </div>
                             </div>
@@ -380,70 +434,58 @@ const ArmarTeam = () => {
                 </div>
             </div>
 
-            {/* ── Sección de Draft (solo admin) ── */}
+            {/* Sección de Equipos */}
             {adminLogueado && (
                 <div className="draft-active-layout">
-                    {fase === 'configuracion' && (
-                        <div className="lobby-setup-wrapper">
-                            <div className="lobby-setup-card">
-                                <div className="lobby-setup-header">
-                                    <h2>CONFIGURACIÓN DEL COMBATE</h2>
-                                    <p>Equipos de {MAX_POR_EQUIPO} jugadores (capitán incluido) — formato CS2</p>
-                                </div>
-                                <div className="setup-options">
-                                    <label className="setup-label">CANTIDAD DE EQUIPOS</label>
-                                    <div className="teams-input-container">
-                                        <button type="button" className="num-adjust-btn"
-                                            onClick={() => setNumEquipos(prev => Math.max(2, prev - 1))}>
-                                            -
-                                        </button>
-                                        <input
-                                            type="number" min="2"
-                                            max={Math.floor(jugadores.length / MAX_POR_EQUIPO)}
-                                            value={numEquipos}
-                                            onChange={(e) => {
-                                                const val = parseInt(e.target.value);
-                                                setNumEquipos(isNaN(val) ? '' : val);
-                                            }}
-                                            onBlur={() => {
-                                                if (!numEquipos || numEquipos < 2) setNumEquipos(2);
-                                            }}
-                                            className="teams-number-input"
-                                        />
-                                        <button type="button" className="num-adjust-btn"
-                                            onClick={() => setNumEquipos(prev => Math.min(Math.floor(jugadores.length / MAX_POR_EQUIPO), prev + 1))}>
-                                            +
-                                        </button>
-                                    </div>
-                                    <span className="setup-help-text">
-                                        Máx. {Math.floor(jugadores.length / MAX_POR_EQUIPO)} equipos con {jugadores.length} agentes registrados
-                                    </span>
-                                </div>
-                                <button type="button" className="val-btn lobby-start-btn" onClick={handleComenzarDraft}>
-                                    INICIAR SELECCIÓN DE CAPITANES
-                                </button>
+                    <div className="teams-config-section">
+                        <div className="teams-header">
+                            <h2>EQUIPOS ({equipos.length})</h2>
+                            <div className="teams-actions">
+                                {fase !== 'listo' && (
+                                    <button
+                                        className="val-btn"
+                                        onClick={agregarEquipo}
+                                        disabled={fase === 'listo' || equipos.length >= MAX_EQUIPOS}
+                                    >
+                                        ➕ AGREGAR TEAM
+                                    </button>
+                                )}
+                                {fase === 'listo' && (
+                                    <button
+                                        className="val-btn matchup-btn"
+                                        onClick={handleEnfrentamientoRandom}
+                                    >
+                                        ⚔️ ENFRENTAMIENTO
+                                    </button>
+                                )}
                             </div>
                         </div>
-                    )}
 
-                    {fase !== 'configuracion' && (
-                        <div className="teams-grid-container"
-                            style={{ gridTemplateColumns: `repeat(${capitanes.length}, minmax(220px, 1fr))` }}>
-                            {Array.from({ length: capitanes.length }).map((_, idx) => {
-                                const capitan = capitanes[idx];
-                                const miembros = equipos[idx] || [];
-                                const esTurnoActivo = fase === 'draft' && turnoDeIndex === idx && !equipoLleno(idx) && !todosLlenos();
+                        <div className="teams-grid-container" style={{ gridTemplateColumns: `repeat(${Math.min(equipos.length || 1, 4)}, minmax(220px, 1fr))` }}>
+                            {equipos.map((equipo, idx) => {
                                 const teamColor = TEAM_COLORS[idx % TEAM_COLORS.length];
-                                const totalMiembros = (capitan ? 1 : 0) + miembros.length;
+                                const totalMiembros = (equipo.capitan ? 1 : 0) + equipo.miembros.length;
+                                const estaCompleto = totalMiembros === MAX_POR_EQUIPO;
 
                                 return (
                                     <div
                                         key={idx}
-                                        className={`team-column ${esTurnoActivo ? 'active-picking' : ''}`}
+                                        className={`team-column ${estaCompleto ? 'team-complete' : ''}`}
                                         style={{ '--team-color': teamColor }}
                                     >
                                         <div className="team-header-panel">
-                                            <h2>EQUIPO {idx + 1}</h2>
+                                            <div className="team-title-row">
+                                                <h2>{equipo.nombre || `EQUIPO ${idx + 1}`}</h2>
+                                                {fase !== 'listo' && !equipo.capitan && equipo.miembros.length === 0 && (
+                                                    <button
+                                                        className="delete-team-btn"
+                                                        onClick={() => eliminarEquipo(idx)}
+                                                        title="Eliminar equipo vacío"
+                                                    >
+                                                        ✕
+                                                    </button>
+                                                )}
+                                            </div>
                                             <div className="team-slots-bar">
                                                 {Array.from({ length: MAX_POR_EQUIPO }).map((_, s) => (
                                                     <div
@@ -454,80 +496,114 @@ const ArmarTeam = () => {
                                                 ))}
                                                 <span className="slots-label">{totalMiembros}/{MAX_POR_EQUIPO}</span>
                                             </div>
-                                            {capitan ? (
+
+                                            {/* Botón Asignar Capitán */}
+                                            <div className="team-actions">
+                                                {fase !== 'listo' && (
+                                                    <button
+                                                        className={`assign-btn ${equipo.capitan ? 'has-captain' : ''}`}
+                                                        onClick={() => asignarJugadorAEquipo(idx, true)}
+                                                        disabled={!!equipo.capitan || !jugadorSeleccionado}
+                                                    >
+                                                        {equipo.capitan ? '✅ CAPITÁN' : '👑 ASIGNAR CAPITÁN'}
+                                                    </button>
+                                                )}
+                                            </div>
+
+                                            {/* Capitán */}
+                                            {equipo.capitan ? (
                                                 <div className="captain-card-small">
-                                                    <img src={capitan.foto} alt={capitan.nombre}
+                                                    <img src={equipo.capitan.foto} alt={equipo.capitan.nombre}
                                                         onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=300&auto=format&fit=crop'; }} />
                                                     <div className="cap-info">
-                                                        <span className="cap-label">CAPITÁN {idx + 1}</span>
-                                                        <span className="cap-name">{capitan.nombre}</span>
+                                                        <span className="cap-label">CAPITÁN</span>
+                                                        <span className="cap-name">{equipo.capitan.nombre}</span>
                                                     </div>
-                                                    <span className="cap-tier-badge" style={{ backgroundColor: `var(--tier-${capitan.tier})`, color: [0, 1, 3].includes(capitan.tier) ? '#fff' : '#000' }}>
-                                                        {capitan.tier === 0 ? 'S' : capitan.tier}
+                                                    <span className="cap-tier-badge" style={{ backgroundColor: `var(--tier-${equipo.capitan.tier})`, color: [0, 1, 3].includes(equipo.capitan.tier) ? '#fff' : '#000' }}>
+                                                        {equipo.capitan.tier === 0 ? 'S' : equipo.capitan.tier}
                                                     </span>
+                                                    {fase !== 'listo' && (
+                                                        <button
+                                                            className="remove-player-btn"
+                                                            onClick={() => removerJugador(idx, equipo.capitan.id, true)}
+                                                            title="Remover capitán"
+                                                        >
+                                                            ✕
+                                                        </button>
+                                                    )}
                                                 </div>
                                             ) : (
-                                                <div className="captain-placeholder">ESPERANDO CAPITÁN...</div>
+                                                <div className="captain-placeholder">
+                                                    {fase !== 'listo' ? '⬅️ SELECCIONA JUGADOR Y ASIGNA' : 'ESPERANDO CAPITÁN...'}
+                                                </div>
                                             )}
-                                        </div>
 
-                                        <div className="team-members-list">
-                                            {miembros.map((j, mIdx) => (
-                                                <div key={j.id} className="team-member-row">
-                                                    <span className="member-index">#{mIdx + 1}</span>
-                                                    <img src={j.foto} alt={j.nombre} className="member-avatar"
-                                                        onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=300&auto=format&fit=crop'; }} />
-                                                    <div className="member-detail">
-                                                        <span className="member-name">{j.nombre}</span>
-                                                        <span className="member-tier" style={{ color: `var(--tier-${j.tier})` }}>
-                                                            {j.tier === 0 ? 'TIER S' : `TIER ${j.tier}`}
-                                                        </span>
+                                            {/* Botón Asignar Miembro */}
+                                            <div className="team-actions" style={{ marginTop: '8px' }}>
+                                                {fase !== 'listo' && equipo.capitan && (
+                                                    <button
+                                                        className={`assign-btn ${totalMiembros >= MAX_POR_EQUIPO ? 'full' : ''}`}
+                                                        onClick={() => asignarJugadorAEquipo(idx, false)}
+                                                        disabled={totalMiembros >= MAX_POR_EQUIPO || !jugadorSeleccionado}
+                                                    >
+                                                        {totalMiembros >= MAX_POR_EQUIPO ? '✅ COMPLETO' : '➕ ASIGNAR JUGADOR'}
+                                                    </button>
+                                                )}
+                                            </div>
+
+                                            {/* Miembros */}
+                                            <div className="team-members-list">
+                                                {equipo.miembros.map((j, mIdx) => (
+                                                    <div key={j.id} className="team-member-row">
+                                                        <span className="member-index">#{mIdx + 1}</span>
+                                                        <img src={j.foto} alt={j.nombre} className="member-avatar"
+                                                            onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=300&auto=format&fit=crop'; }} />
+                                                        <div className="member-detail">
+                                                            <span className="member-name">{j.nombre}</span>
+                                                            <span className="member-tier" style={{ color: `var(--tier-${j.tier})` }}>
+                                                                {j.tier === 0 ? 'TIER S' : `TIER ${j.tier}`}
+                                                            </span>
+                                                        </div>
+                                                        {fase !== 'listo' && (
+                                                            <button
+                                                                className="remove-player-btn small"
+                                                                onClick={() => removerJugador(idx, j.id, false)}
+                                                                title="Remover jugador"
+                                                            >
+                                                                ✕
+                                                            </button>
+                                                        )}
                                                     </div>
-                                                </div>
-                                            ))}
-                                            {Array.from({ length: Math.max(0, (MAX_POR_EQUIPO - 1) - miembros.length) }).map((_, s) => (
-                                                <div key={`empty-${s}`} className="team-member-row empty-slot">
-                                                    <span className="member-index">#{miembros.length + s + 1}</span>
-                                                    <div className="empty-slot-avatar"></div>
-                                                    <div className="member-detail">
-                                                        <span className="empty-slot-label">— SLOT DISPONIBLE —</span>
+                                                ))}
+                                                {Array.from({ length: Math.max(0, (MAX_POR_EQUIPO - 1) - equipo.miembros.length) }).map((_, s) => (
+                                                    <div key={`empty-${s}`} className="team-member-row empty-slot">
+                                                        <span className="member-index">#{equipo.miembros.length + s + 1}</span>
+                                                        <div className="empty-slot-avatar"></div>
+                                                        <div className="member-detail">
+                                                            <span className="empty-slot-label">— SLOT —</span>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            ))}
+                                                ))}
+                                            </div>
+
+                                            {estaCompleto && (
+                                                <div className="team-complete-badge">✅ COMPLETO</div>
+                                            )}
                                         </div>
                                     </div>
                                 );
                             })}
                         </div>
-                    )}
+                    </div>
                 </div>
             )}
 
-            {/* ── Botón Enfrentamiento ── */}
-            {adminLogueado && fase === 'draft' && capitanes.length > 0 && capitanes.every(c => c !== null) && (() => {
-                const allFull = capitanes.every((_, idx) => {
-                    const miembros = equipos[idx] || [];
-                    return miembros.length >= MAX_POR_EQUIPO - 1;
-                });
-                return allFull ? (
-                    <div className="matchup-trigger-wrapper">
-                        <button
-                            className="val-btn matchup-btn"
-                            onClick={handleEnfrentamientoRandom}
-                        >
-                            ⚔️ ENFRENTAMIENTO RANDOM
-                        </button>
-                    </div>
-                ) : null;
-            })()}
-
-            {/* ── Modal de Enfrentamiento ── */}
+            {/* Modal de Enfrentamiento */}
             {matchups && (
                 <div className="matchup-overlay" onClick={() => setMatchups(null)}>
                     <div className="matchup-modal" onClick={e => e.stopPropagation()}>
                         <div className="matchup-modal-header">
                             <h2>⚔️ ENFRENTAMIENTOS</h2>
-                            <p className="matchup-subtitle">Bracket generado aleatoriamente</p>
                             <button className="matchup-close-btn" onClick={() => setMatchups(null)}>✕</button>
                         </div>
                         <div className="matchup-brackets">

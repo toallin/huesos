@@ -867,3 +867,457 @@
     font-size: 1.5rem;
   }
 }
+
+/* Estilos para los nuevos elementos */
+
+.teams-config-section {
+  margin-top: 30px;
+  background: #1a1a2e;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #2a2a4a;
+}
+
+.teams-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.teams-header h2 {
+  color: #ffffff;
+  font-size: 20px;
+}
+
+.team-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.delete-team-btn {
+  background: none;
+  border: none;
+  color: #ff4655;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 8px;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.delete-team-btn:hover:not(:disabled) {
+  opacity: 1;
+}
+
+.delete-team-btn:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+}
+
+.remove-player-btn {
+  background: none;
+  border: none;
+  color: #ff4655;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 0 4px;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.remove-player-btn:hover {
+  opacity: 1;
+}
+
+.remove-player-btn.small {
+  font-size: 10px;
+  margin-left: 4px;
+}
+
+.team-complete {
+  border-color: #00ff88 !important;
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
+}
+
+.team-complete-badge {
+  text-align: center;
+  color: #00ff88;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  margin-top: 8px;
+  padding: 4px;
+  border-top: 1px solid rgba(0, 255, 136, 0.2);
+}
+
+.draft-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.draft-actions .val-btn {
+  width: auto;
+  padding: 12px 30px;
+}
+
+/* ============================================================
+   NUEVOS ESTILOS: HABILITADO / DESHABILITADO
+   ============================================================ */
+
+/* ── Jugadores deshabilitados (GRIS) ── */
+.pool-card-item.deshabilitado {
+  opacity: 0.4;
+  filter: grayscale(1) brightness(0.6);
+  cursor: not-allowed;
+  border-color: #2a2a4a;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.pool-card-item.deshabilitado:hover {
+  transform: none !important;
+  box-shadow: none !important;
+  border-color: #2a2a4a;
+}
+
+.pool-card-item.deshabilitado .pool-card-info h3 {
+  color: #5a5a7a;
+}
+
+.pool-card-item.deshabilitado .pool-card-status {
+  color: #4a4a6a;
+}
+
+/* ── Jugadores habilitados (BRILLAN) ── */
+.pool-card-item.habilitado {
+  opacity: 1;
+  filter: none;
+  cursor: pointer;
+  border-color: #00ff88;
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.15);
+  animation: glowPulse 1.8s ease-in-out infinite;
+  transition: all 0.3s ease;
+}
+
+.pool-card-item.habilitado:hover {
+  transform: translateY(-5px);
+  border-color: #00ff88;
+  box-shadow: 0 8px 30px rgba(0, 255, 136, 0.35);
+}
+
+.pool-card-item.habilitado .pool-card-info h3 {
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+}
+
+.pool-card-item.habilitado .pool-card-status {
+  color: #00ff88;
+  font-weight: 700;
+}
+
+@keyframes glowPulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.1);
+    border-color: rgba(0, 255, 136, 0.5);
+  }
+
+  50% {
+    box-shadow: 0 0 35px rgba(0, 255, 136, 0.3);
+    border-color: #00ff88;
+  }
+}
+
+/* ── Jugadores seleccionados (OSCUROS) ── */
+.pool-card-item.dark-selected {
+  opacity: 0.3;
+  filter: grayscale(100%) brightness(0.3);
+  cursor: not-allowed;
+  pointer-events: none;
+  border-color: #1a1a3a;
+  animation: none !important;
+}
+
+.pool-card-item.dark-selected .pool-card-info h3 {
+  color: #3a3a5a;
+}
+
+.pool-card-item.dark-selected .pool-card-status {
+  color: #2a2a4a;
+}
+
+/* ── Sobrescritura para vista sin admin ── */
+.pool-card-item.no-admin {
+  opacity: 0.35;
+  filter: grayscale(0.8) brightness(0.5);
+  cursor: not-allowed;
+  pointer-events: none;
+  border-color: #1a1a2a;
+}
+
+.pool-card-item.no-admin:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* ── Slots del equipo ── */
+.team-column .slot-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 2px;
+  background-color: #1a1a2e;
+  border: 1px solid #2a2a4a;
+  transition: all 0.3s ease;
+}
+
+.team-column .slot-dot.filled {
+  border-color: var(--team-color);
+  box-shadow: 0 0 10px rgba(var(--team-color-rgb, 255, 70, 85), 0.3);
+}
+
+/* ── Team Slots Bar ── */
+.team-slots-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 10px;
+  padding: 4px 0;
+}
+
+.slots-label {
+  font-size: 0.65rem;
+  color: var(--val-text-muted);
+  margin-left: 8px;
+  font-family: var(--mono);
+  letter-spacing: 0.5px;
+}
+
+/* ── Botón AGREGAR TEAM ── */
+.teams-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.teams-actions .val-btn {
+  width: auto;
+  padding: 10px 20px;
+  font-size: 0.85rem;
+}
+
+.teams-actions .val-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+
+/* ── Botón ENFRENTAMIENTO ── */
+.matchup-btn {
+  background: linear-gradient(135deg, #ff4655, #c0001a) !important;
+  color: #fff !important;
+  border: none !important;
+  font-size: 1.1rem !important;
+  padding: 14px 35px !important;
+  letter-spacing: 2px !important;
+  animation: matchupPulse 2s ease-in-out infinite;
+}
+
+.matchup-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 40px rgba(255, 70, 85, 0.4);
+}
+
+@keyframes matchupPulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 70, 85, 0.4);
+  }
+
+  50% {
+    box-shadow: 0 0 30px 10px rgba(255, 70, 85, 0.2);
+  }
+}
+
+/* ── Estado de equipo activo (turno) ── */
+.team-column.active-picking {
+  border-color: var(--team-color) !important;
+  animation: activeTeamGlow 1.5s ease-in-out infinite;
+}
+
+@keyframes activeTeamGlow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(var(--team-color-rgb, 255, 70, 85), 0.1);
+  }
+
+  50% {
+    box-shadow: 0 0 40px rgba(var(--team-color-rgb, 255, 70, 85), 0.25);
+  }
+}
+
+/* ── Equipo completo ── */
+.team-column.team-complete {
+  border-color: #00ff88 !important;
+  box-shadow: 0 0 30px rgba(0, 255, 136, 0.08);
+}
+
+.team-complete-badge {
+  text-align: center;
+  color: #00ff88;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  padding: 6px;
+  border-top: 1px solid rgba(0, 255, 136, 0.15);
+  margin-top: 8px;
+  text-transform: uppercase;
+}
+
+/* ── Capitán placeholder ── */
+.captain-placeholder {
+  text-align: center;
+  padding: 12px 10px;
+  border: 1px dashed #2a2a4a;
+  color: #4a4a6a;
+  font-family: var(--heading);
+  font-size: 0.7rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* ── Miembro vacío ── */
+.team-member-row.empty-slot {
+  opacity: 0.4;
+  border-style: dashed;
+  border-color: #1a1a3a;
+}
+
+.empty-slot-avatar {
+  width: 30px;
+  height: 30px;
+  border: 1px dashed #2a2a4a;
+  border-radius: 2px;
+}
+
+.empty-slot-label {
+  font-size: 0.6rem;
+  color: #3a3a5a;
+  letter-spacing: 0.5px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .teams-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .teams-actions {
+    justify-content: center;
+  }
+
+  .pool-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 8px;
+  }
+
+  .pool-card-img-wrapper {
+    height: 60px;
+  }
+
+  .pool-card-info h3 {
+    font-size: 0.7rem;
+  }
+
+  .pool-card-status {
+    font-size: 0.5rem;
+  }
+}
+
+/* ── Botones de Asignación ── */
+.team-actions {
+  display: flex;
+  gap: 8px;
+  margin: 6px 0;
+}
+
+.assign-btn {
+  width: 100%;
+  padding: 6px 12px;
+  background: rgba(0, 255, 136, 0.1);
+  border: 1px solid rgba(0, 255, 136, 0.2);
+  color: #00ff88;
+  font-family: var(--heading);
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  clip-path: polygon(5px 0, 100% 0, calc(100% - 5px) 100%, 0 100%);
+}
+
+.assign-btn:hover:not(:disabled) {
+  background: rgba(0, 255, 136, 0.2);
+  border-color: #00ff88;
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
+}
+
+.assign-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.assign-btn.has-captain {
+  background: rgba(0, 255, 136, 0.05);
+  border-color: rgba(0, 255, 136, 0.1);
+  color: #4a4a6a;
+}
+
+.assign-btn.full {
+  background: rgba(0, 255, 136, 0.15);
+  border-color: #00ff88;
+  color: #00ff88;
+}
+
+/* ── Jugador seleccionado activo ── */
+.pool-card-item.selected-active {
+  border-color: #00ff88 !important;
+  box-shadow: 0 0 40px rgba(0, 255, 136, 0.4) !important;
+  transform: scale(1.05);
+  animation: selectedPulse 1s ease-in-out infinite;
+}
+
+@keyframes selectedPulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 50px rgba(0, 255, 136, 0.6);
+  }
+}
+
+/* ── Indicador de selección ── */
+.selected-indicator {
+  font-size: 0.85rem;
+  font-weight: 700;
+  animation: selectedPulse 1.5s ease-in-out infinite;
+  display: inline-block;
+  padding: 4px 12px;
+  background: rgba(0, 255, 136, 0.1);
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  clip-path: polygon(5px 0, 100% 0, calc(100% - 5px) 100%, 0 100%);
+}

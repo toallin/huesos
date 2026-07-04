@@ -131,6 +131,30 @@
       "nombre": "secpal",
       "tier": 2,
       "foto": "https://i.pinimg.com/736x/7e/a2/6f/7ea26fa6fe1a0ed068e7a53e61836290.jpg"
+    },
+    {
+      "id": 1783139309772,
+      "nombre": "trukaz",
+      "tier": 3,
+      "foto": "https://i.pinimg.com/736x/d7/84/e6/d784e6d7bf7d39b5ac855b0e2c6855f9.jpg"
+    },
+    {
+      "id": 1783139408138,
+      "nombre": "Kon!g",
+      "tier": 3,
+      "foto": "https://i.pinimg.com/736x/d8/38/55/d83855112c78b5835d3e430ecc645cd0.jpg"
+    },
+    {
+      "id": 1783140087316,
+      "nombre": "vnn1",
+      "tier": 3,
+      "foto": "https://i.pinimg.com/1200x/59/aa/8c/59aa8cf453c121888590c6486f6f1c8b.jpg"
+    },
+    {
+      "id": 1783140142541,
+      "nombre": "mistake",
+      "tier": 4,
+      "foto": "https://i.pinimg.com/736x/48/70/e3/4870e3c2e04507fc762e375f566c7d54.jpg"
     }
   ]
 }
