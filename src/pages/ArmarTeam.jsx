@@ -7,17 +7,21 @@ const MAX_POR_EQUIPO = 5;
 const MAX_EQUIPOS = 10;
 
 const TEAM_COLORS = [
-    '#ff4655', // Rojo Carmesí
-    '#f1c40f', // Amarillo Oro
-    '#00e5ff', // Cian Neón
-    '#aa3bff', // Púrpura Neón
-    '#2ecc71', // Verde Esmeralda
-    '#e67e22', // Naranja Fuego
-    '#3498db', // Azul Cobalto
-    '#e74c3c', // Rojo Tomate
-    '#9b59b6', // Violeta Oscuro
-    '#1abc9c'  // Verde Turquesa
+    '#ff4655', '#f1c40f', '#00e5ff', '#aa3bff', '#2ecc71',
+    '#e67e22', '#3498db', '#e74c3c', '#9b59b6', '#1abc9c'
 ];
+
+// ORDEN DE TIERS (S = 0, 1, 2, 3, 4, 5)
+const TIER_ORDER = [0, 1, 2, 3, 4, 5];
+const TIER_LABELS = { 0: 'S', 1: '1', 2: '2', 3: '3', 4: '4', 5: '5' };
+const TIER_COLORS = {
+    0: '#ff4655',  // S - Rojo
+    1: '#ff6b35',  // 1 - Naranja
+    2: '#ffd700',  // 2 - Dorado
+    3: '#00e5ff',  // 3 - Cian
+    4: '#3498db',  // 4 - Azul
+    5: '#9b59b6'   // 5 - Violeta
+};
 
 const ArmarTeam = () => {
     const [jugadores, setJugadores] = useState([]);
@@ -30,9 +34,10 @@ const ArmarTeam = () => {
 
     // Draft state
     const [equipos, setEquipos] = useState([]);
-    const [fase, setFase] = useState('configuracion'); // 'configuracion' | 'seleccion' | 'listo'
-    const [jugadorSeleccionado, setJugadorSeleccionado] = useState(null); // Jugador que el admin seleccionó para asignar
+    const [fase, setFase] = useState('configuracion');
+    const [jugadorSeleccionado, setJugadorSeleccionado] = useState(null);
     const [jugadoresSeleccionados, setJugadoresSeleccionados] = useState([]);
+    const [jugadoresHabilitados, setJugadoresHabilitados] = useState({});
 
     // Matchup state
     const [matchups, setMatchups] = useState(null);
@@ -47,11 +52,22 @@ const ArmarTeam = () => {
         try {
             const data = await jugadorService.getAll();
             setJugadores(data);
+            const inicialHabilitados = {};
+            data.forEach(j => {
+                inicialHabilitados[j.id] = false;
+            });
+            setJugadoresHabilitados(inicialHabilitados);
         } catch (error) {
             console.error('Error cargando jugadores:', error);
             const localData = localStorage.getItem('listaJugadores');
             if (localData) {
-                setJugadores(JSON.parse(localData));
+                const parsed = JSON.parse(localData);
+                setJugadores(parsed);
+                const inicialHabilitados = {};
+                parsed.forEach(j => {
+                    inicialHabilitados[j.id] = false;
+                });
+                setJugadoresHabilitados(inicialHabilitados);
             }
         } finally {
             setLoading(false);
@@ -82,17 +98,70 @@ const ArmarTeam = () => {
         setMatchups(null);
         setJugadoresSeleccionados([]);
         setJugadorSeleccionado(null);
+        const inicialHabilitados = {};
+        jugadores.forEach(j => {
+            inicialHabilitados[j.id] = false;
+        });
+        setJugadoresHabilitados(inicialHabilitados);
+    };
+
+    // ── Funciones de habilitar/deshabilitar ──
+    const toggleHabilitarJugador = (jugadorId) => {
+        if (!adminLogueado) return;
+        if (jugadoresSeleccionados.includes(jugadorId)) {
+            alert('No puedes deshabilitar un jugador que ya está en un equipo');
+            return;
+        }
+        setJugadoresHabilitados(prev => ({
+            ...prev,
+            [jugadorId]: !prev[jugadorId]
+        }));
+    };
+
+    const habilitarTodos = () => {
+        if (!adminLogueado) return;
+        const nuevos = {};
+        jugadores.forEach(j => {
+            nuevos[j.id] = !jugadoresSeleccionados.includes(j.id);
+        });
+        setJugadoresHabilitados(nuevos);
+    };
+
+    const deshabilitarTodos = () => {
+        if (!adminLogueado) return;
+        const nuevos = {};
+        jugadores.forEach(j => {
+            nuevos[j.id] = jugadoresSeleccionados.includes(j.id);
+        });
+        setJugadoresHabilitados(nuevos);
+    };
+
+    // ── Seleccionar jugador para equipo ──
+    const seleccionarJugadorParaEquipo = (jugador) => {
+        if (!adminLogueado) return;
+        if (fase === 'listo') return;
+        if (jugadoresSeleccionados.includes(jugador.id)) {
+            alert('Este jugador ya está en un equipo');
+            return;
+        }
+        if (!jugadoresHabilitados[jugador.id]) {
+            alert('Este jugador está deshabilitado. Habilítalo primero.');
+            return;
+        }
+
+        if (jugadorSeleccionado?.id === jugador.id) {
+            setJugadorSeleccionado(null);
+            return;
+        }
+        setJugadorSeleccionado(jugador);
     };
 
     // ── Funciones del Draft ──
-
-    // Agregar nuevo equipo
     const agregarEquipo = () => {
         if (equipos.length >= MAX_EQUIPOS) {
             alert(`Máximo ${MAX_EQUIPOS} equipos permitidos`);
             return;
         }
-
         setEquipos([...equipos, {
             capitan: null,
             miembros: [],
@@ -100,7 +169,6 @@ const ArmarTeam = () => {
         }]);
     };
 
-    // Eliminar equipo
     const eliminarEquipo = (idx) => {
         const equipo = equipos[idx];
         if (equipo.capitan || equipo.miembros.length > 0) {
@@ -111,33 +179,20 @@ const ArmarTeam = () => {
         setEquipos(nuevosEquipos);
     };
 
-    // Seleccionar un jugador del pool (para asignarlo a un equipo)
-    const seleccionarJugadorPool = (jugador) => {
-        if (!adminLogueado) return;
-        if (fase === 'listo') return;
-        if (jugadoresSeleccionados.includes(jugador.id)) {
-            alert('Este jugador ya está en un equipo');
-            return;
-        }
-
-        // Si el jugador ya está seleccionado, lo deseleccionamos
-        if (jugadorSeleccionado?.id === jugador.id) {
-            setJugadorSeleccionado(null);
-            return;
-        }
-
-        setJugadorSeleccionado(jugador);
-    };
-
-    // Asignar jugador seleccionado a un equipo
     const asignarJugadorAEquipo = (equipoIdx, esCapitan = false) => {
         if (!jugadorSeleccionado) {
-            alert('Primero selecciona un jugador del pool');
+            alert('Primero selecciona un jugador de la lista');
             return;
         }
 
         if (jugadoresSeleccionados.includes(jugadorSeleccionado.id)) {
             alert('Este jugador ya está en un equipo');
+            setJugadorSeleccionado(null);
+            return;
+        }
+
+        if (!jugadoresHabilitados[jugadorSeleccionado.id]) {
+            alert('Este jugador está deshabilitado');
             setJugadorSeleccionado(null);
             return;
         }
@@ -173,7 +228,6 @@ const ArmarTeam = () => {
             setJugadorSeleccionado(null);
         }
 
-        // Verificar si todos los equipos están completos
         const todosLlenos = equipos.every(eq => {
             const total = (eq.capitan ? 1 : 0) + eq.miembros.length;
             return total === MAX_POR_EQUIPO;
@@ -183,7 +237,6 @@ const ArmarTeam = () => {
         }
     };
 
-    // Remover jugador de un equipo
     const removerJugador = (equipoIdx, jugadorId, esCapitan = false) => {
         if (!adminLogueado) return;
         if (fase === 'listo') return;
@@ -198,19 +251,19 @@ const ArmarTeam = () => {
         setJugadoresSeleccionados(prev => prev.filter(id => id !== jugadorId));
     };
 
-    // Auto-draft (opcional)
     const handleAutodraft = () => {
         if (fase === 'listo') return;
 
-        const disponibles = jugadores.filter(j => !jugadoresSeleccionados.includes(j.id));
-        if (disponibles.length === 0) return;
+        const disponibles = jugadores.filter(j => !jugadoresSeleccionados.includes(j.id) && jugadoresHabilitados[j.id]);
+        if (disponibles.length === 0) {
+            alert('No hay jugadores habilitados disponibles');
+            return;
+        }
 
-        // Primero, asegurar que todos los equipos tengan capitán
         let nuevosEquipos = equipos.map(eq => ({ ...eq, miembros: [...eq.miembros] }));
         let nuevosSeleccionados = [...jugadoresSeleccionados];
         let disponiblesRestantes = [...disponibles];
 
-        // Asignar capitanes a equipos sin capitán
         nuevosEquipos.forEach((eq, idx) => {
             if (!eq.capitan && disponiblesRestantes.length > 0) {
                 const jugador = disponiblesRestantes.shift();
@@ -219,7 +272,6 @@ const ArmarTeam = () => {
             }
         });
 
-        // Llenar el resto de los equipos
         disponiblesRestantes.forEach(jugador => {
             for (let i = 0; i < nuevosEquipos.length; i++) {
                 const total = (nuevosEquipos[i].capitan ? 1 : 0) + nuevosEquipos[i].miembros.length;
@@ -235,7 +287,6 @@ const ArmarTeam = () => {
         setJugadoresSeleccionados(nuevosSeleccionados);
         setJugadorSeleccionado(null);
 
-        // Verificar si todos están llenos
         const todosLlenos = nuevosEquipos.every(eq => {
             const total = (eq.capitan ? 1 : 0) + eq.miembros.length;
             return total === MAX_POR_EQUIPO;
@@ -245,7 +296,6 @@ const ArmarTeam = () => {
         }
     };
 
-    // Generar enfrentamientos
     const handleEnfrentamientoRandom = () => {
         const todosLlenos = equipos.every(eq => {
             const total = (eq.capitan ? 1 : 0) + eq.miembros.length;
@@ -275,6 +325,15 @@ const ArmarTeam = () => {
         setMatchups(pares);
     };
 
+    // ── Obtener jugadores agrupados por tier ──
+    const getJugadoresPorTier = () => {
+        const agrupados = {};
+        TIER_ORDER.forEach(tier => {
+            agrupados[tier] = jugadores.filter(j => j.tier === tier);
+        });
+        return agrupados;
+    };
+
     // ── Instruction bar ──
     const getInstruccion = () => {
         if (!adminLogueado) {
@@ -283,7 +342,7 @@ const ArmarTeam = () => {
         if (fase === 'configuracion') {
             return (
                 <div className="draft-instruction-bar setup-phase">
-                    🏆 1. SELECCIONA UN JUGADOR → 2. ASÍGNALO COMO CAPITÁN A UN EQUIPO
+                    🏆 HABILITA JUGADORES → SELECCIONA → ASIGNA A EQUIPOS
                 </div>
             );
         }
@@ -302,6 +361,13 @@ const ArmarTeam = () => {
             </div>
         );
     }
+
+    const totalHabilitados = Object.values(jugadoresHabilitados).filter(v => v).length;
+    const totalDisponibles = jugadores.filter(j =>
+        !jugadoresSeleccionados.includes(j.id) && jugadoresHabilitados[j.id]
+    ).length;
+
+    const jugadoresPorTier = getJugadoresPorTier();
 
     return (
         <div className="draft-page-container">
@@ -359,85 +425,176 @@ const ArmarTeam = () => {
                 )}
             </header>
 
-            {/* Pool de Agentes */}
-            <div className="players-pool-panel">
-                <div className="pool-header">
-                    <h2>
-                        POOL DE AGENTES
-                        <span className="pool-count-badge">
-                            {jugadores.filter(j => !jugadoresSeleccionados.includes(j.id)).length} DISPONIBLES / {jugadores.length} TOTAL
-                        </span>
-                        {jugadorSeleccionado && (
-                            <span className="selected-indicator" style={{ color: '#00ff88', marginLeft: '15px' }}>
-                                ✅ SELECCIONADO: {jugadorSeleccionado.nombre}
+            {/* CONTENEDOR PRINCIPAL: Lista de jugadores a la izquierda, Equipos a la derecha */}
+            <div className="draft-main-layout">
+                {/* PANEL IZQUIERDO: Lista de Jugadores por Tier */}
+                <div className="players-list-panel">
+                    <div className="list-header">
+                        <h2>
+                            JUGADORES
+                            <span className="list-count-badge">
+                                {totalDisponibles} DISP / {jugadores.length} TOT
                             </span>
-                        )}
-                    </h2>
+                            <span className="list-count-badge habilitados-badge">
+                                ✅ {totalHabilitados}
+                            </span>
+                            <span className="list-count-badge deshabilitados-badge">
+                                ⛔ {jugadores.length - totalHabilitados - jugadoresSeleccionados.length}
+                            </span>
+                            {jugadorSeleccionado && (
+                                <span className="selected-indicator">
+                                    ✅ {jugadorSeleccionado.nombre}
+                                </span>
+                            )}
+                        </h2>
+                        <div className="list-actions">
+                            {adminLogueado && fase !== 'listo' && (
+                                <>
+                                    <button className="val-btn secondary small-btn" onClick={habilitarTodos}>
+                                        ✅ TODOS
+                                    </button>
+                                    <button className="val-btn secondary small-btn" onClick={deshabilitarTodos}>
+                                        ❌ NINGUNO
+                                    </button>
+                                    <button className="val-btn secondary small-btn" onClick={handleAutodraft}>
+                                        ⚡ AUTO
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Leyenda */}
                     {adminLogueado && fase !== 'listo' && (
-                        <button className="val-btn secondary" onClick={handleAutodraft}>
-                            ⚡ AUTO-DRAFT
-                        </button>
+                        <div className="controles-leyenda">
+                            <span className="leyenda-item">🖱️ Click = Seleccionar</span>
+                            <span className="leyenda-item">🖱️ Click Der = Habilitar/Deshabilitar</span>
+                            <span className="leyenda-item">✅ Habilitado</span>
+                            <span className="leyenda-item">⛔ Deshabilitado</span>
+                        </div>
                     )}
-                </div>
 
-                <div className="pool-grid">
-                    {jugadores.map((jugador) => {
-                        const seleccionado = jugadoresSeleccionados.includes(jugador.id);
-                        const esJugadorSeleccionado = jugadorSeleccionado?.id === jugador.id;
-                        const habilitado = adminLogueado && !seleccionado && fase !== 'listo';
+                    {/* Lista horizontal por Tier */}
+                    <div className="tier-list-container">
+                        {TIER_ORDER.map(tier => {
+                            const jugadoresTier = jugadoresPorTier[tier] || [];
+                            if (jugadoresTier.length === 0) return null;
 
-                        return (
-                            <div
-                                key={jugador.id}
-                                className={`pool-card-item tier-${jugador.tier} 
-                                    ${seleccionado ? 'dark-selected' : ''} 
-                                    ${esJugadorSeleccionado ? 'selected-active' : ''} 
-                                    ${habilitado ? 'habilitado' : 'deshabilitado'}`}
-                                onClick={() => habilitado && seleccionarJugadorPool(jugador)}
-                            >
-                                <div className="pool-card-img-wrapper">
-                                    <img
-                                        src={jugador.foto}
-                                        alt={jugador.nombre}
-                                        onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=300&auto=format&fit=crop'; }}
-                                    />
-                                    {seleccionado && (
-                                        <div className="card-selected-overlay">
-                                            <span className="overlay-badge">
-                                                {equipos.findIndex(eq => eq.capitan?.id === jugador.id) !== -1 ?
-                                                    `CAP ${equipos.findIndex(eq => eq.capitan?.id === jugador.id) + 1}` :
-                                                    `EQ ${equipos.findIndex(eq => eq.miembros.some(m => m.id === jugador.id)) + 1}`
-                                                }
-                                            </span>
-                                        </div>
-                                    )}
-                                    {esJugadorSeleccionado && (
-                                        <div className="card-selected-overlay" style={{ background: 'rgba(0, 255, 136, 0.2)' }}>
-                                            <span className="overlay-badge" style={{ borderColor: '#00ff88', color: '#00ff88' }}>SELECCIONADO</span>
-                                        </div>
-                                    )}
-                                    <div className="pool-card-tier" style={{ backgroundColor: `var(--tier-${jugador.tier})` }}>
-                                        {jugador.tier === 0 ? 'TS' : `T${jugador.tier}`}
+                            return (
+                                <div key={tier} className="tier-group">
+                                    <div className="tier-header" style={{ borderColor: TIER_COLORS[tier] }}>
+                                        <span className="tier-label" style={{ color: TIER_COLORS[tier] }}>
+                                            TIER {TIER_LABELS[tier]}
+                                        </span>
+                                        <span className="tier-count">{jugadoresTier.length} jugadores</span>
+                                    </div>
+                                    <div className="tier-players-horizontal">
+                                        {jugadoresTier.map(jugador => {
+                                            const seleccionado = jugadoresSeleccionados.includes(jugador.id);
+                                            const habilitado = jugadoresHabilitados[jugador.id] || false;
+                                            const esJugadorSeleccionado = jugadorSeleccionado?.id === jugador.id;
+                                            const enEquipo = seleccionado;
+
+                                            return (
+                                                <div
+                                                    key={jugador.id}
+                                                    className={`player-card ${enEquipo ? 'en-equipo' : ''} 
+                                                        ${esJugadorSeleccionado ? 'seleccionado-activo' : ''}
+                                                        ${!enEquipo && habilitado ? 'habilitado' : ''}
+                                                        ${!enEquipo && !habilitado ? 'deshabilitado' : ''}
+                                                        ${adminLogueado && !enEquipo ? 'admin-interactable' : ''}`}
+                                                    onClick={() => {
+                                                        if (!adminLogueado) return;
+                                                        if (enEquipo) return;
+                                                        if (habilitado) {
+                                                            seleccionarJugadorParaEquipo(jugador);
+                                                        }
+                                                    }}
+                                                    onContextMenu={(e) => {
+                                                        e.preventDefault();
+                                                        if (!adminLogueado) return;
+                                                        if (enEquipo) {
+                                                            alert('No puedes deshabilitar un jugador en equipo');
+                                                            return;
+                                                        }
+                                                        toggleHabilitarJugador(jugador.id);
+                                                    }}
+                                                >
+                                                    <div className="player-avatar" style={{ borderColor: TIER_COLORS[tier] }}>
+                                                        <img
+                                                            src={jugador.foto}
+                                                            alt={jugador.nombre}
+                                                            onError={(e) => {
+                                                                e.target.src = 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=300&auto=format&fit=crop';
+                                                            }}
+                                                        />
+                                                        <span className="player-tier-badge" style={{ backgroundColor: TIER_COLORS[tier] }}>
+                                                            {TIER_LABELS[tier]}
+                                                        </span>
+                                                        {enEquipo && (
+                                                            <span className="player-equipo-badge">
+                                                                EQ {equipos.findIndex(eq =>
+                                                                    eq.capitan?.id === jugador.id ||
+                                                                    eq.miembros.some(m => m.id === jugador.id)
+                                                                ) + 1}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <div className="player-info">
+                                                        <span className="player-name">{jugador.nombre}</span>
+                                                        <span className={`player-status ${enEquipo ? 'status-en-equipo' : habilitado ? 'status-habilitado' : 'status-deshabilitado'}`}>
+                                                            {enEquipo ? '✅ EN EQ' :
+                                                                esJugadorSeleccionado ? '🟢 SEL' :
+                                                                    habilitado ? '🟡 HAB' : '🔴 DES'}
+                                                        </span>
+                                                    </div>
+                                                    <div className="player-actions">
+                                                        {adminLogueado && !enEquipo && fase !== 'listo' && (
+                                                            <>
+                                                                <button
+                                                                    className={`action-btn toggle-btn ${habilitado ? 'activo' : ''}`}
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        toggleHabilitarJugador(jugador.id);
+                                                                    }}
+                                                                    title={habilitado ? 'Deshabilitar' : 'Habilitar'}
+                                                                >
+                                                                    {habilitado ? '✅' : '⛔'}
+                                                                </button>
+                                                                <button
+                                                                    className={`action-btn select-btn ${esJugadorSeleccionado ? 'activo' : ''}`}
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        if (habilitado) {
+                                                                            seleccionarJugadorParaEquipo(jugador);
+                                                                        } else {
+                                                                            alert('Habilita el jugador primero');
+                                                                        }
+                                                                    }}
+                                                                    disabled={!habilitado}
+                                                                    title={esJugadorSeleccionado ? 'Deseleccionar' : 'Seleccionar'}
+                                                                >
+                                                                    {esJugadorSeleccionado ? '🔵' : '⚪'}
+                                                                </button>
+                                                            </>
+                                                        )}
+                                                        {enEquipo && (
+                                                            <span className="en-equipo-label">✅</span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
                                     </div>
                                 </div>
-                                <div className="pool-card-info">
-                                    <h3>{jugador.nombre}</h3>
-                                    <span className="pool-card-status">
-                                        {seleccionado ? '✅ EN EQUIPO' :
-                                            esJugadorSeleccionado ? '🟢 SELECCIONADO' :
-                                                (habilitado ? '🟡 DISPONIBLE' : '⚫ DESHABILITADO')}
-                                    </span>
-                                </div>
-                            </div>
-                        );
-                    })}
+                            );
+                        })}
+                    </div>
                 </div>
-            </div>
 
-            {/* Sección de Equipos */}
-            {adminLogueado && (
-                <div className="draft-active-layout">
-                    <div className="teams-config-section">
+                {/* PANEL DERECHO: Equipos */}
+                {adminLogueado && (
+                    <div className="teams-panel">
                         <div className="teams-header">
                             <h2>EQUIPOS ({equipos.length})</h2>
                             <div className="teams-actions">
@@ -447,7 +604,7 @@ const ArmarTeam = () => {
                                         onClick={agregarEquipo}
                                         disabled={fase === 'listo' || equipos.length >= MAX_EQUIPOS}
                                     >
-                                        ➕ AGREGAR TEAM
+                                        ➕ AGREGAR
                                     </button>
                                 )}
                                 {fase === 'listo' && (
@@ -455,13 +612,13 @@ const ArmarTeam = () => {
                                         className="val-btn matchup-btn"
                                         onClick={handleEnfrentamientoRandom}
                                     >
-                                        ⚔️ ENFRENTAMIENTO
+                                        ⚔️ ENFRENTAR
                                     </button>
                                 )}
                             </div>
                         </div>
 
-                        <div className="teams-grid-container" style={{ gridTemplateColumns: `repeat(${Math.min(equipos.length || 1, 4)}, minmax(220px, 1fr))` }}>
+                        <div className="teams-horizontal-scroll">
                             {equipos.map((equipo, idx) => {
                                 const teamColor = TEAM_COLORS[idx % TEAM_COLORS.length];
                                 const totalMiembros = (equipo.capitan ? 1 : 0) + equipo.miembros.length;
@@ -470,12 +627,12 @@ const ArmarTeam = () => {
                                 return (
                                     <div
                                         key={idx}
-                                        className={`team-column ${estaCompleto ? 'team-complete' : ''}`}
+                                        className={`team-card ${estaCompleto ? 'team-complete' : ''}`}
                                         style={{ '--team-color': teamColor }}
                                     >
-                                        <div className="team-header-panel">
+                                        <div className="team-card-header">
                                             <div className="team-title-row">
-                                                <h2>{equipo.nombre || `EQUIPO ${idx + 1}`}</h2>
+                                                <h3>{equipo.nombre || `EQ ${idx + 1}`}</h3>
                                                 {fase !== 'listo' && !equipo.capitan && equipo.miembros.length === 0 && (
                                                     <button
                                                         className="delete-team-btn"
@@ -496,32 +653,18 @@ const ArmarTeam = () => {
                                                 ))}
                                                 <span className="slots-label">{totalMiembros}/{MAX_POR_EQUIPO}</span>
                                             </div>
+                                        </div>
 
-                                            {/* Botón Asignar Capitán */}
-                                            <div className="team-actions">
-                                                {fase !== 'listo' && (
-                                                    <button
-                                                        className={`assign-btn ${equipo.capitan ? 'has-captain' : ''}`}
-                                                        onClick={() => asignarJugadorAEquipo(idx, true)}
-                                                        disabled={!!equipo.capitan || !jugadorSeleccionado}
-                                                    >
-                                                        {equipo.capitan ? '✅ CAPITÁN' : '👑 ASIGNAR CAPITÁN'}
-                                                    </button>
-                                                )}
-                                            </div>
-
+                                        <div className="team-players-list">
                                             {/* Capitán */}
                                             {equipo.capitan ? (
-                                                <div className="captain-card-small">
+                                                <div className="team-player captain">
                                                     <img src={equipo.capitan.foto} alt={equipo.capitan.nombre}
                                                         onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=300&auto=format&fit=crop'; }} />
-                                                    <div className="cap-info">
-                                                        <span className="cap-label">CAPITÁN</span>
-                                                        <span className="cap-name">{equipo.capitan.nombre}</span>
+                                                    <div className="team-player-info">
+                                                        <span className="team-player-name">{equipo.capitan.nombre}</span>
+                                                        <span className="team-player-role">CAPITÁN</span>
                                                     </div>
-                                                    <span className="cap-tier-badge" style={{ backgroundColor: `var(--tier-${equipo.capitan.tier})`, color: [0, 1, 3].includes(equipo.capitan.tier) ? '#fff' : '#000' }}>
-                                                        {equipo.capitan.tier === 0 ? 'S' : equipo.capitan.tier}
-                                                    </span>
                                                     {fase !== 'listo' && (
                                                         <button
                                                             className="remove-player-btn"
@@ -533,35 +676,31 @@ const ArmarTeam = () => {
                                                     )}
                                                 </div>
                                             ) : (
-                                                <div className="captain-placeholder">
-                                                    {fase !== 'listo' ? '⬅️ SELECCIONA JUGADOR Y ASIGNA' : 'ESPERANDO CAPITÁN...'}
+                                                <div className="team-player empty-captain">
+                                                    <span>👑 SIN CAPITÁN</span>
+                                                    {fase !== 'listo' && jugadorSeleccionado && (
+                                                        <button
+                                                            className="assign-btn small"
+                                                            onClick={() => asignarJugadorAEquipo(idx, true)}
+                                                        >
+                                                            ASIGNAR
+                                                        </button>
+                                                    )}
                                                 </div>
                                             )}
 
-                                            {/* Botón Asignar Miembro */}
-                                            <div className="team-actions" style={{ marginTop: '8px' }}>
-                                                {fase !== 'listo' && equipo.capitan && (
-                                                    <button
-                                                        className={`assign-btn ${totalMiembros >= MAX_POR_EQUIPO ? 'full' : ''}`}
-                                                        onClick={() => asignarJugadorAEquipo(idx, false)}
-                                                        disabled={totalMiembros >= MAX_POR_EQUIPO || !jugadorSeleccionado}
-                                                    >
-                                                        {totalMiembros >= MAX_POR_EQUIPO ? '✅ COMPLETO' : '➕ ASIGNAR JUGADOR'}
-                                                    </button>
-                                                )}
-                                            </div>
-
                                             {/* Miembros */}
-                                            <div className="team-members-list">
-                                                {equipo.miembros.map((j, mIdx) => (
-                                                    <div key={j.id} className="team-member-row">
-                                                        <span className="member-index">#{mIdx + 1}</span>
-                                                        <img src={j.foto} alt={j.nombre} className="member-avatar"
+                                            {equipo.miembros.map((j, mIdx) => {
+                                                const tierColor = TIER_COLORS[j.tier] || '#ffffff';
+                                                return (
+                                                    <div key={j.id} className="team-player member">
+                                                        <span className="member-number">#{mIdx + 1}</span>
+                                                        <img src={j.foto} alt={j.nombre}
                                                             onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=300&auto=format&fit=crop'; }} />
-                                                        <div className="member-detail">
-                                                            <span className="member-name">{j.nombre}</span>
-                                                            <span className="member-tier" style={{ color: `var(--tier-${j.tier})` }}>
-                                                                {j.tier === 0 ? 'TIER S' : `TIER ${j.tier}`}
+                                                        <div className="team-player-info">
+                                                            <span className="team-player-name">{j.nombre}</span>
+                                                            <span className="team-player-tier" style={{ color: tierColor }}>
+                                                                T{TIER_LABELS[j.tier]}
                                                             </span>
                                                         </div>
                                                         {fase !== 'listo' && (
@@ -574,29 +713,39 @@ const ArmarTeam = () => {
                                                             </button>
                                                         )}
                                                     </div>
-                                                ))}
-                                                {Array.from({ length: Math.max(0, (MAX_POR_EQUIPO - 1) - equipo.miembros.length) }).map((_, s) => (
-                                                    <div key={`empty-${s}`} className="team-member-row empty-slot">
-                                                        <span className="member-index">#{equipo.miembros.length + s + 1}</span>
-                                                        <div className="empty-slot-avatar"></div>
-                                                        <div className="member-detail">
-                                                            <span className="empty-slot-label">— SLOT —</span>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
+                                                );
+                                            })}
 
-                                            {estaCompleto && (
-                                                <div className="team-complete-badge">✅ COMPLETO</div>
+                                            {/* Slots vacíos */}
+                                            {Array.from({ length: Math.max(0, MAX_POR_EQUIPO - 1 - equipo.miembros.length) }).map((_, s) => (
+                                                <div key={`empty-${s}`} className="team-player empty-slot">
+                                                    <span className="empty-slot-icon">⬜</span>
+                                                    <span className="empty-slot-label">SLOT {equipo.miembros.length + s + 1}</span>
+                                                </div>
+                                            ))}
+
+                                            {/* Botón para agregar jugador */}
+                                            {fase !== 'listo' && equipo.capitan && totalMiembros < MAX_POR_EQUIPO && (
+                                                <button
+                                                    className="add-player-btn"
+                                                    onClick={() => asignarJugadorAEquipo(idx, false)}
+                                                    disabled={!jugadorSeleccionado}
+                                                >
+                                                    {jugadorSeleccionado ? '➕ AGREGAR' : '🔒 SELECCIONA UN JUGADOR'}
+                                                </button>
                                             )}
                                         </div>
+
+                                        {estaCompleto && (
+                                            <div className="team-complete-badge">✅ COMPLETO</div>
+                                        )}
                                     </div>
                                 );
                             })}
                         </div>
                     </div>
-                </div>
-            )}
+                )}
+            </div>
 
             {/* Modal de Enfrentamiento */}
             {matchups && (
@@ -620,9 +769,17 @@ const ArmarTeam = () => {
                                             </div>
                                         </div>
                                         <ul className="matchup-players">
-                                            {par[0].miembros.map(m => (
-                                                <li key={m.id}>{m.nombre} <span style={{ color: `var(--tier-${m.tier})`, fontSize: '0.7rem' }}>{m.tier === 0 ? 'S' : `T${m.tier}`}</span></li>
-                                            ))}
+                                            {par[0].miembros.map(m => {
+                                                const tierColor = TIER_COLORS[m.tier] || '#ffffff';
+                                                return (
+                                                    <li key={m.id}>
+                                                        {m.nombre}
+                                                        <span style={{ color: tierColor, fontSize: '0.7rem' }}>
+                                                            T{TIER_LABELS[m.tier]}
+                                                        </span>
+                                                    </li>
+                                                );
+                                            })}
                                         </ul>
                                     </div>
 
@@ -640,9 +797,17 @@ const ArmarTeam = () => {
                                                 </div>
                                             </div>
                                             <ul className="matchup-players">
-                                                {par[1].miembros.map(m => (
-                                                    <li key={m.id}>{m.nombre} <span style={{ color: `var(--tier-${m.tier})`, fontSize: '0.7rem' }}>{m.tier === 0 ? 'S' : `T${m.tier}`}</span></li>
-                                                ))}
+                                                {par[1].miembros.map(m => {
+                                                    const tierColor = TIER_COLORS[m.tier] || '#ffffff';
+                                                    return (
+                                                        <li key={m.id}>
+                                                            {m.nombre}
+                                                            <span style={{ color: tierColor, fontSize: '0.7rem' }}>
+                                                                T{TIER_LABELS[m.tier]}
+                                                            </span>
+                                                        </li>
+                                                    );
+                                                })}
                                             </ul>
                                         </div>
                                     ) : (

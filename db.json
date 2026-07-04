@@ -155,6 +155,24 @@
       "nombre": "mistake",
       "tier": 4,
       "foto": "https://i.pinimg.com/736x/48/70/e3/4870e3c2e04507fc762e375f566c7d54.jpg"
+    },
+    {
+      "id": 1783140677819,
+      "nombre": "Fernantouile",
+      "tier": 1,
+      "foto": "https://i.pinimg.com/1200x/4f/95/18/4f9518c4714ed6bade9aa181baff97b5.jpg"
+    },
+    {
+      "id": 1783140939700,
+      "nombre": "mazerkod",
+      "tier": 0,
+      "foto": "https://i.pinimg.com/736x/60/23/b3/6023b34e9bdf5c031d0f0d4a715730db.jpg"
+    },
+    {
+      "id": 1783141140499,
+      "nombre": "eloiky",
+      "tier": 2,
+      "foto": "https://i.pinimg.com/736x/60/23/b3/6023b34e9bdf5c031d0f0d4a715730db.jpg"
     }
   ]
 }

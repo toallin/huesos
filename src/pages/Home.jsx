@@ -8,7 +8,6 @@ const Home = () => {
     const [tierFiltro, setTierFiltro] = useState('todos');
     const [loading, setLoading] = useState(false);
 
-    // Cargar jugadores desde el backend
     useEffect(() => {
         cargarJugadores();
     }, []);
@@ -17,14 +16,11 @@ const Home = () => {
         setLoading(true);
         try {
             const data = await jugadorService.getAll();
-            console.log('✅ Jugadores cargados desde el servidor (Home):', data);
             setJugadores(data);
         } catch (error) {
-            console.error('❌ Error cargando jugadores (Home):', error);
-            // Si hay error, intentar cargar desde localStorage como fallback
+            console.error('Error cargando jugadores:', error);
             const localData = localStorage.getItem('listaJugadores');
             if (localData) {
-                console.log('📦 Usando datos de localStorage como fallback');
                 setJugadores(JSON.parse(localData));
             }
         } finally {
@@ -43,21 +39,6 @@ const Home = () => {
             <header className="home-header">
                 <h1>AGENTES REGISTRADOS</h1>
                 <p className="home-subtitle">Lista de jugadores para el draft de salas mixtas</p>
-
-                <div className="stats-bar">
-                    <div className="stat-card">
-                        <span className="stat-value">{jugadores.length}</span>
-                        <span className="stat-label">TOTAL JUGADORES</span>
-                    </div>
-                    <div className="stat-card">
-                        <span className="stat-value">{jugadores.filter(j => j.tier === 0).length}</span>
-                        <span className="stat-label">TIER S (DIOS)</span>
-                    </div>
-                    <div className="stat-card">
-                        <span className="stat-value">{jugadores.filter(j => j.tier === 1).length}</span>
-                        <span className="stat-label">TIER 1 (ELITE)</span>
-                    </div>
-                </div>
             </header>
 
             <div className="filters-container">
@@ -80,7 +61,7 @@ const Home = () => {
                     </button>
                     <button
                         className={tierFiltro === '0' ? 'val-btn active' : 'val-btn secondary'}
-                        style={tierFiltro === '0' ? { backgroundColor: `var(--tier-0)`, borderColor: `var(--tier-0)` } : {}}
+                        style={tierFiltro === '0' ? { backgroundColor: '#ff4655', borderColor: '#ff4655' } : {}}
                         onClick={() => setTierFiltro('0')}
                     >
                         TIER S
@@ -102,8 +83,8 @@ const Home = () => {
                     className="val-btn secondary"
                     style={{
                         width: 'auto',
-                        padding: '10px 18px',
-                        fontSize: '12px',
+                        padding: '8px 16px',
+                        fontSize: '11px',
                         letterSpacing: '0.5px'
                     }}
                     disabled={loading}
@@ -112,31 +93,36 @@ const Home = () => {
                 </button>
             </div>
 
-            <div className="grid-jugadores">
+            <div className="stats-bar-compact">
+                <span className="stat-item">Total: <strong>{jugadores.length}</strong></span>
+                <span className="stat-item">Tier S: <strong style={{ color: '#ff4655' }}>{jugadores.filter(j => j.tier === 0).length}</strong></span>
+                <span className="stat-item">Tier 1: <strong style={{ color: '#ff6b35' }}>{jugadores.filter(j => j.tier === 1).length}</strong></span>
+                <span className="stat-item">Tier 2: <strong style={{ color: '#ffd700' }}>{jugadores.filter(j => j.tier === 2).length}</strong></span>
+                <span className="stat-item">Tier 3: <strong style={{ color: '#00e5ff' }}>{jugadores.filter(j => j.tier === 3).length}</strong></span>
+                <span className="stat-item">Tier 4: <strong style={{ color: '#3498db' }}>{jugadores.filter(j => j.tier === 4).length}</strong></span>
+                <span className="stat-item">Tier 5: <strong style={{ color: '#9b59b6' }}>{jugadores.filter(j => j.tier === 5).length}</strong></span>
+            </div>
+
+            <div className="grid-jugadores-compact">
                 {loading ? (
                     <div className="empty-message-container">
-                        <p className="empty-message">⏳ Cargando jugadores desde el servidor...</p>
+                        <p className="empty-message">⏳ Cargando jugadores...</p>
                     </div>
                 ) : jugadoresFiltrados.length > 0 ? (
                     jugadoresFiltrados.map((jugador) => (
-                        <div key={jugador.id} className={`card-jugador tier-${jugador.tier}`}>
-                            <div className="card-image-wrapper">
+                        <div key={jugador.id} className="card-jugador-compact">
+                            <div className="card-image-wrapper-compact">
                                 <img src={jugador.foto} alt={jugador.nombre} onError={(e) => {
                                     e.target.src = 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=300&auto=format&fit=crop';
                                 }} />
-                                <div className="card-tier-badge" style={{ backgroundColor: `var(--tier-${jugador.tier})` }}>
-                                    {jugador.tier === 0 ? 'TIER S' : `TIER ${jugador.tier}`}
-                                </div>
+                                <span className="card-tier-badge-compact" style={{ backgroundColor: `var(--tier-${jugador.tier})` }}>
+                                    {jugador.tier === 0 ? 'S' : jugador.tier}
+                                </span>
                             </div>
-
-                            <div className="info-container">
-                                <h3>{jugador.nombre}</h3>
-                                <div className="card-footer-lines">
-                                    <span className="card-role-label">AGENTE MIXTONE</span>
-                                    <span className="card-tech-id">#{jugador.id.toString().slice(-4)}</span>
-                                </div>
+                            <div className="card-info-compact">
+                                <span className="card-name-compact">{jugador.nombre}</span>
+                                <span className="card-role-compact">AGENTE MIXTONE</span>
                             </div>
-                            <div className="card-edge-cut"></div>
                         </div>
                     ))
                 ) : (
