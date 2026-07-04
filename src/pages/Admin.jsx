@@ -8,6 +8,7 @@ const Admin = () => {
     const [nombre, setNombre] = useState('');
     const [tier, setTier] = useState(1);
     const [foto, setFoto] = useState('');
+    const [frase, setFrase] = useState(''); // NUEVO: Campo para la frase
     const [jugadores, setJugadores] = useState([]);
     const [editingId, setEditingId] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -50,13 +51,21 @@ const Admin = () => {
 
         setLoading(true);
         try {
+            // Crear el objeto del jugador con la frase
+            const jugadorData = {
+                nombre,
+                tier,
+                foto,
+                frase: frase.trim() || null // Si no hay frase, guardar null
+            };
+
             if (editingId) {
                 // Actualizar jugador existente
-                await jugadorService.update(editingId, { nombre, tier, foto });
+                await jugadorService.update(editingId, jugadorData);
                 alert('✅ Jugador actualizado correctamente');
             } else {
                 // Crear nuevo jugador
-                await jugadorService.create({ nombre, tier, foto });
+                await jugadorService.create(jugadorData);
                 alert('✅ Jugador guardado correctamente');
             }
 
@@ -67,6 +76,7 @@ const Admin = () => {
             setNombre('');
             setTier(1);
             setFoto('');
+            setFrase('');
             setEditingId(null);
         } catch (error) {
             console.error('❌ Error al guardar:', error);
@@ -80,6 +90,7 @@ const Admin = () => {
         setNombre(jugador.nombre);
         setTier(jugador.tier);
         setFoto(jugador.foto);
+        setFrase(jugador.frase || ''); // Cargar la frase existente
         setEditingId(jugador.id);
     };
 
@@ -87,6 +98,7 @@ const Admin = () => {
         setNombre('');
         setTier(1);
         setFoto('');
+        setFrase('');
         setEditingId(null);
     };
 
@@ -136,11 +148,24 @@ const Admin = () => {
         );
     }
 
+    // Obtener ejemplo de frase según el tier
+    const getFraseEjemplo = (tierValue) => {
+        const ejemplos = {
+            0: '🌟 Leyenda del hub',
+            1: '⭐ Elite del hub',
+            2: '💎 Veterano del hub',
+            3: '🔷 Competente del hub',
+            4: '🟦 Promesa del hub',
+            5: '🟩 Recluta del hub'
+        };
+        return ejemplos[tierValue] || '💪 Jugador del hub';
+    };
+
     return (
         <div className="admin-page-container">
             <header className="admin-header">
                 <h1>PANEL DE CONTROL</h1>
-                <p>Gestionar jugadores, tiers y avatares del sistema</p>
+                <p>Gestionar jugadores, tiers, avatares y frases del sistema</p>
                 <button
                     onClick={cargarJugadores}
                     className="val-btn secondary"
@@ -193,6 +218,21 @@ const Admin = () => {
                             />
                         </div>
 
+                        {/* NUEVO: Campo para la frase */}
+                        <div className="form-group">
+                            <label>FRASE / TOOLTIP</label>
+                            <input
+                                type="text"
+                                placeholder={`Ej. ${getFraseEjemplo(tier)}`}
+                                value={frase}
+                                onChange={(e) => setFrase(e.target.value)}
+                                disabled={loading}
+                            />
+                            <small style={{ color: 'rgba(255,255,255,0.4)', fontSize: '10px', display: 'block', marginTop: '4px' }}>
+                                💡 Esta frase aparecerá al pasar el mouse sobre el jugador en el Home
+                            </small>
+                        </div>
+
                         <div className="form-actions">
                             <button type="submit" className="val-btn" disabled={loading}>
                                 {loading ? '⏳ PROCESANDO...' : (editingId ? 'ACTUALIZAR' : 'GUARDAR JUGADOR')}
@@ -216,6 +256,7 @@ const Admin = () => {
                                     <th>FOTO</th>
                                     <th>NOMBRE</th>
                                     <th>TIER</th>
+                                    <th>FRASE</th>
                                     <th>ACCIONES</th>
                                 </tr>
                             </thead>
@@ -242,6 +283,13 @@ const Admin = () => {
                                                     {jugador.tier === 0 ? 'TIER S' : `TIER ${jugador.tier}`}
                                                 </span>
                                             </td>
+                                            <td className="frase-cell">
+                                                {jugador.frase ? (
+                                                    <span className="frase-tag">💬 {jugador.frase}</span>
+                                                ) : (
+                                                    <span className="frase-empty">—</span>
+                                                )}
+                                            </td>
                                             <td>
                                                 <div className="table-actions">
                                                     <button
@@ -266,7 +314,7 @@ const Admin = () => {
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="4" className="table-empty-msg">
+                                        <td colSpan="5" className="table-empty-msg">
                                             {loading ? 'Cargando jugadores...' : 'No hay jugadores registrados en el sistema.'}
                                         </td>
                                     </tr>
