@@ -113,6 +113,24 @@
       "nombre": "CHAIBOL",
       "tier": 0,
       "foto": "https://i.pinimg.com/736x/88/47/2d/88472d6c5616357fbdee91639f7413e5.jpg"
+    },
+    {
+      "id": 1783138695990,
+      "nombre": "Stitch",
+      "tier": 3,
+      "foto": "https://i.pinimg.com/736x/fe/22/34/fe2234b761e8cc589de18c2565c417a4.jpg"
+    },
+    {
+      "id": 1783138736612,
+      "nombre": "marduk",
+      "tier": 3,
+      "foto": "https://i.pinimg.com/736x/50/a6/74/50a674b69a38843d31c5c2c2ab4f5db4.jpg"
+    },
+    {
+      "id": 1783138793875,
+      "nombre": "secpal",
+      "tier": 2,
+      "foto": "https://i.pinimg.com/736x/7e/a2/6f/7ea26fa6fe1a0ed068e7a53e61836290.jpg"
     }
   ]
 }
