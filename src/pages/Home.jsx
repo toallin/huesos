@@ -7,8 +7,6 @@ const Home = () => {
     const [busqueda, setBusqueda] = useState('');
     const [tierFiltro, setTierFiltro] = useState('todos');
     const [loading, setLoading] = useState(false);
-    const [tooltipVisible, setTooltipVisible] = useState(null);
-    const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
 
     useEffect(() => {
         cargarJugadores();
@@ -35,22 +33,6 @@ const Home = () => {
         const matchesTier = tierFiltro === 'todos' || jugador.tier === parseInt(tierFiltro);
         return matchesNombre && matchesTier;
     });
-
-    // Manejar tooltip
-    const handleMouseEnter = (jugador, e) => {
-        setTooltipVisible(jugador.id);
-        setTooltipPos({ x: e.clientX, y: e.clientY });
-    };
-
-    const handleMouseLeave = () => {
-        setTooltipVisible(null);
-    };
-
-    const handleMouseMove = (e) => {
-        if (tooltipVisible) {
-            setTooltipPos({ x: e.clientX, y: e.clientY });
-        }
-    };
 
     return (
         <div className="home-container">
@@ -131,9 +113,6 @@ const Home = () => {
                         <div
                             key={jugador.id}
                             className="card-jugador-compact"
-                            onMouseEnter={(e) => handleMouseEnter(jugador, e)}
-                            onMouseLeave={handleMouseLeave}
-                            onMouseMove={handleMouseMove}
                         >
                             <div className="card-image-wrapper-compact">
                                 <img src={jugador.foto} alt={jugador.nombre} onError={(e) => {
@@ -142,24 +121,22 @@ const Home = () => {
                                 <span className="card-tier-badge-compact" style={{ backgroundColor: `var(--tier-${jugador.tier})` }}>
                                     {jugador.tier === 0 ? 'S' : jugador.tier}
                                 </span>
+
+                                {/* ── OVERLAY CON LA FRASE ── */}
+                                {jugador.frase && (
+                                    <div className="card-hover-overlay">
+                                        <div className="card-hover-content">
+                                            <span className="card-hover-quote">"</span>
+                                            <span className="card-hover-text">{jugador.frase}</span>
+                                            <span className="card-hover-quote">"</span>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                             <div className="card-info-compact">
                                 <span className="card-name-compact">{jugador.nombre}</span>
                                 <span className="card-role-compact">AGENTE MIXTONE</span>
                             </div>
-
-                            {/* Tooltip */}
-                            {tooltipVisible === jugador.id && jugador.frase && (
-                                <div
-                                    className="custom-tooltip"
-                                    style={{
-                                        left: tooltipPos.x + 15,
-                                        top: tooltipPos.y - 30
-                                    }}
-                                >
-                                    {jugador.frase}
-                                </div>
-                            )}
                         </div>
                     ))
                 ) : (
