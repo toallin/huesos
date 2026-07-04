@@ -4,175 +4,204 @@
       "id": 1783063540949,
       "nombre": "NaG4_666",
       "tier": 5,
-      "foto": "https://i.pinimg.com/736x/69/6c/d5/696cd5d4d8beb91b1f0d27bc5f8fc1d2.jpg"
+      "foto": "https://i.pinimg.com/736x/69/6c/d5/696cd5d4d8beb91b1f0d27bc5f8fc1d2.jpg",
+      "frase": "😈 El más malvado del hub"
     },
     {
       "id": 1783137491275,
       "nombre": "KENNYWO",
       "tier": 4,
-      "foto": "https://i.pinimg.com/1200x/63/35/8b/63358bf44fb07db8648f386daab611b1.jpg"
+      "foto": "https://i.pinimg.com/1200x/63/35/8b/63358bf44fb07db8648f386daab611b1.jpg",
+      "frase": "🎯 El más preciso del hub"
     },
     {
       "id": 1783137512506,
       "nombre": "2A",
       "tier": 4,
-      "foto": "https://i.pinimg.com/1200x/7d/9c/0a/7d9c0a1b6d9b692a6be0d4ad4c5a0421.jpg"
+      "foto": "https://i.pinimg.com/1200x/7d/9c/0a/7d9c0a1b6d9b692a6be0d4ad4c5a0421.jpg",
+      "frase": "⚡ El más rápido del hub"
     },
     {
       "id": 1783137536831,
       "nombre": "KOTARO2 ",
       "tier": 3,
-      "foto": "https://i.pinimg.com/1200x/9b/b8/04/9bb804facbb6cd05c478080db6f9e5a4.jpg"
+      "foto": "https://i.pinimg.com/1200x/9b/b8/04/9bb804facbb6cd05c478080db6f9e5a4.jpg",
+      "frase": "💪 Agente del hub"
     },
     {
       "id": 1783137564292,
       "nombre": "OPTIMUS",
       "tier": 3,
-      "foto": "https://i.pinimg.com/736x/8d/4c/7c/8d4c7c15b7e3adbb59af9423eabbb7af.jpg"
+      "foto": "https://i.pinimg.com/736x/8d/4c/7c/8d4c7c15b7e3adbb59af9423eabbb7af.jpg",
+      "frase": "🤖 El más robótico del hub"
     },
     {
       "id": 1783137596436,
       "nombre": "ZCODY ",
       "tier": 3,
-      "foto": "https://i.pinimg.com/736x/b5/79/23/b579239b00afe433f9846880599a9319.jpg"
+      "foto": "https://i.pinimg.com/736x/b5/79/23/b579239b00afe433f9846880599a9319.jpg",
+      "frase": "💪 Agente del hub"
     },
     {
       "id": 1783137618262,
       "nombre": "SHELLGOOD",
       "tier": 3,
-      "foto": "https://i.pinimg.com/736x/06/48/0d/06480dc24efc3625e40c8815d6985a49.jpg"
+      "foto": "https://i.pinimg.com/736x/06/48/0d/06480dc24efc3625e40c8815d6985a49.jpg",
+      "frase": "🐚 El más tranquilo del hub"
     },
     {
       "id": 1783137634791,
       "nombre": "LAPS",
       "tier": 3,
-      "foto": "https://i.pinimg.com/736x/c2/fd/b1/c2fdb1013acebbad92a2b0d7da8d38c4.jpg"
+      "foto": "https://i.pinimg.com/736x/c2/fd/b1/c2fdb1013acebbad92a2b0d7da8d38c4.jpg",
+      "frase": "🏃 El más veloz del hub"
     },
     {
       "id": 1783137653562,
       "nombre": "KEVS ",
       "tier": 2,
-      "foto": "https://i.pinimg.com/1200x/5e/36/47/5e3647b199def95cfdc76c2d2207501e.jpg"
+      "foto": "https://i.pinimg.com/1200x/5e/36/47/5e3647b199def95cfdc76c2d2207501e.jpg",
+      "frase": "💪 Agente del hub"
     },
     {
       "id": 1783137684571,
       "nombre": "WALLACE",
       "tier": 2,
-      "foto": "https://i.pinimg.com/1200x/14/97/11/149711fea2e618a1df5da1684f97be41.jpg"
+      "foto": "https://i.pinimg.com/1200x/14/97/11/149711fea2e618a1df5da1684f97be41.jpg",
+      "frase": "🛡️ El más resistente del hub"
     },
     {
       "id": 1783137709235,
       "nombre": "DKROSS",
       "tier": 2,
-      "foto": "https://i.pinimg.com/736x/c2/58/e6/c258e6b38190bc3fd3ebe9e2bd8d1098.jpg"
+      "foto": "https://i.pinimg.com/736x/c2/58/e6/c258e6b38190bc3fd3ebe9e2bd8d1098.jpg",
+      "frase": "🎮 El tryhard del hub"
     },
     {
       "id": 1783137729705,
       "nombre": "D4DDY ",
       "tier": 2,
-      "foto": "https://i.pinimg.com/736x/e9/8b/6f/e98b6fd2b06a00e458ededfac209d889.jpg"
+      "foto": "https://i.pinimg.com/736x/e9/8b/6f/e98b6fd2b06a00e458ededfac209d889.jpg",
+      "frase": "💪 Agente del hub"
     },
     {
       "id": 1783137749877,
       "nombre": "NATO",
       "tier": 2,
-      "foto": "https://i.pinimg.com/736x/08/c0/7a/08c07a3c6d3448609a66731461e30b37.jpg"
+      "foto": "https://i.pinimg.com/736x/08/c0/7a/08c07a3c6d3448609a66731461e30b37.jpg",
+      "frase": "🌍 El más internacional del hub"
     },
     {
       "id": 1783137774901,
       "nombre": "MANZANA ",
       "tier": 1,
-      "foto": "https://i.pinimg.com/736x/7b/17/e1/7b17e1cc7c52e35a22a7036e6b3152af.jpg"
+      "foto": "https://i.pinimg.com/736x/7b/17/e1/7b17e1cc7c52e35a22a7036e6b3152af.jpg",
+      "frase": "💪 Agente del hub"
     },
     {
       "id": 1783137793908,
       "nombre": "PEREZA",
       "tier": 1,
-      "foto": "https://i.pinimg.com/736x/e0/53/75/e05375443eea918d48fe931b32401923.jpg"
+      "foto": "https://i.pinimg.com/736x/e0/53/75/e05375443eea918d48fe931b32401923.jpg",
+      "frase": "😴 El más dormilón del hub"
     },
     {
       "id": 1783137818859,
       "nombre": " COOKIE",
       "tier": 1,
-      "foto": "https://i.pinimg.com/1200x/2b/73/5e/2b735e3653db332c4e6f65123c3fb5cb.jpg"
+      "foto": "https://i.pinimg.com/1200x/2b/73/5e/2b735e3653db332c4e6f65123c3fb5cb.jpg",
+      "frase": "💪 Agente del hub"
     },
     {
       "id": 1783137836296,
       "nombre": "WONDS ",
       "tier": 0,
-      "foto": "https://i.pinimg.com/736x/f6/6f/a9/f66fa9042c91fff904d9114e6218f99d.jpg"
+      "foto": "https://i.pinimg.com/736x/f6/6f/a9/f66fa9042c91fff904d9114e6218f99d.jpg",
+      "frase": "💪 Agente del hub"
     },
     {
       "id": 1783137858979,
       "nombre": "IPPO",
       "tier": 0,
-      "foto": "https://i.pinimg.com/736x/69/6c/d5/696cd5d4d8beb91b1f0d27bc5f8fc1d2.jpg"
+      "foto": "https://i.pinimg.com/736x/69/6c/d5/696cd5d4d8beb91b1f0d27bc5f8fc1d2.jpg",
+      "frase": "💪 El más fuerte del hub"
     },
     {
       "id": 1783137874740,
       "nombre": "CHAIBOL",
       "tier": 0,
-      "foto": "https://i.pinimg.com/736x/88/47/2d/88472d6c5616357fbdee91639f7413e5.jpg"
+      "foto": "https://i.pinimg.com/736x/88/47/2d/88472d6c5616357fbdee91639f7413e5.jpg",
+      "frase": "🎯 El más preciso del hub"
     },
     {
       "id": 1783138695990,
       "nombre": "Stitch",
       "tier": 3,
-      "foto": "https://i.pinimg.com/736x/fe/22/34/fe2234b761e8cc589de18c2565c417a4.jpg"
+      "foto": "https://i.pinimg.com/736x/fe/22/34/fe2234b761e8cc589de18c2565c417a4.jpg",
+      "frase": "🌀 El más caótico del hub"
     },
     {
       "id": 1783138736612,
       "nombre": "marduk",
       "tier": 3,
-      "foto": "https://i.pinimg.com/736x/50/a6/74/50a674b69a38843d31c5c2c2ab4f5db4.jpg"
+      "foto": "https://i.pinimg.com/736x/50/a6/74/50a674b69a38843d31c5c2c2ab4f5db4.jpg",
+      "frase": "🌊 El más profundo del hub"
     },
     {
       "id": 1783138793875,
       "nombre": "secpal",
       "tier": 2,
-      "foto": "https://i.pinimg.com/736x/7e/a2/6f/7ea26fa6fe1a0ed068e7a53e61836290.jpg"
+      "foto": "https://i.pinimg.com/736x/7e/a2/6f/7ea26fa6fe1a0ed068e7a53e61836290.jpg",
+      "frase": "🔒 El más seguro del hub"
     },
     {
       "id": 1783139309772,
       "nombre": "trukaz",
       "tier": 3,
-      "foto": "https://i.pinimg.com/736x/d7/84/e6/d784e6d7bf7d39b5ac855b0e2c6855f9.jpg"
+      "foto": "https://i.pinimg.com/736x/d7/84/e6/d784e6d7bf7d39b5ac855b0e2c6855f9.jpg",
+      "frase": "🚛 El más pesado del hub"
     },
     {
       "id": 1783139408138,
       "nombre": "Kon!g",
       "tier": 3,
-      "foto": "https://i.pinimg.com/736x/d8/38/55/d83855112c78b5835d3e430ecc645cd0.jpg"
+      "foto": "https://i.pinimg.com/736x/d8/38/55/d83855112c78b5835d3e430ecc645cd0.jpg",
+      "frase": "👑 El rey del hub"
     },
     {
       "id": 1783140087316,
       "nombre": "vnn1",
       "tier": 3,
-      "foto": "https://i.pinimg.com/1200x/59/aa/8c/59aa8cf453c121888590c6486f6f1c8b.jpg"
+      "foto": "https://i.pinimg.com/1200x/59/aa/8c/59aa8cf453c121888590c6486f6f1c8b.jpg",
+      "frase": "💎 El más valioso del hub"
     },
     {
       "id": 1783140142541,
       "nombre": "mistake",
       "tier": 4,
-      "foto": "https://i.pinimg.com/736x/48/70/e3/4870e3c2e04507fc762e375f566c7d54.jpg"
+      "foto": "https://i.pinimg.com/736x/48/70/e3/4870e3c2e04507fc762e375f566c7d54.jpg",
+      "frase": "🎲 El más impredecible del hub"
     },
     {
       "id": 1783140677819,
       "nombre": "Fernantouile",
       "tier": 1,
-      "foto": "https://i.pinimg.com/1200x/4f/95/18/4f9518c4714ed6bade9aa181baff97b5.jpg"
+      "foto": "https://i.pinimg.com/1200x/4f/95/18/4f9518c4714ed6bade9aa181baff97b5.jpg",
+      "frase": "👨‍🍳 El chef del hub"
     },
     {
       "id": 1783140939700,
       "nombre": "mazerkod",
       "tier": 0,
-      "foto": "https://i.pinimg.com/736x/60/23/b3/6023b34e9bdf5c031d0f0d4a715730db.jpg"
+      "foto": "https://i.pinimg.com/736x/60/23/b3/6023b34e9bdf5c031d0f0d4a715730db.jpg",
+      "frase": "🧠 El más táctico del hub"
     },
     {
       "id": 1783141140499,
       "nombre": "eloiky",
       "tier": 2,
-      "foto": "https://i.pinimg.com/736x/60/23/b3/6023b34e9bdf5c031d0f0d4a715730db.jpg"
+      "foto": "https://i.pinimg.com/736x/60/23/b3/6023b34e9bdf5c031d0f0d4a715730db.jpg",
+      "frase": "🌟 El más prometedor del hub"
     }
   ]
 }

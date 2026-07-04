@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { jugadorService } from '../services/jugadorService.js';
-import './Home.css';
+import './Home.css?t=20260704';
 
 const Home = () => {
     const [jugadores, setJugadores] = useState([]);
